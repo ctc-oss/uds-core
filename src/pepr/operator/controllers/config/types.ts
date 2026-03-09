@@ -14,6 +14,7 @@ export type CABundle = {
 export type Config = {
   domain: string;
   adminDomain: string;
+  ssoBaseUrl: string;
   caBundle: CABundle;
   authserviceRedisUri: string;
   allowAllNSExemptions: boolean;

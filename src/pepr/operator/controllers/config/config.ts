@@ -26,6 +26,7 @@ export const configLog = setupLogger(Component.OPERATOR_CONFIG);
 export const UDSConfig: Config = {
   domain: "",
   adminDomain: "",
+  ssoBaseUrl: "",
   caBundle: {
     certs: "",
     includeDoDCerts: false,
@@ -356,6 +357,10 @@ export async function handleCfg(cfg: ClusterConfig, action: ConfigAction) {
         UDSConfig.adminDomain = `admin.${UDSConfig.domain}`;
       }
       // todo: Add logic to handle domain changes and update across virtualservices, authservice config, etc
+    }
+
+    if (!UDSConfig.ssoBaseUrl) {
+      UDSConfig.ssoBaseUrl = `https://sso.${UDSConfig.domain}`;
     }
 
     // Update other config values (no need for special handling)

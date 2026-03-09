@@ -190,7 +190,7 @@ function jwtAuthZAuthorizationPolicy(
   const rules: NonNullable<IstioAuthorizationPolicy["spec"]>["rules"] = [];
 
   const ssoJwtSource = {
-    notRequestPrincipals: [`https://sso.${UDSConfig.domain}/realms/uds/*`],
+    notRequestPrincipals: [`${UDSConfig.ssoBaseUrl}/realms/uds/*`],
   };
 
   const prometheusOrSsoJwtSource = {
@@ -268,8 +268,8 @@ function authNRequestAuthentication(
         {
           audiences: [name],
           forwardOriginalToken: true,
-          issuer: `https://sso.${UDSConfig.domain}/realms/uds`,
-          jwksUri: `https://sso.${UDSConfig.domain}/realms/uds/protocol/openid-connect/certs`,
+          issuer: `${UDSConfig.ssoBaseUrl}/realms/uds`,
+          jwksUri: `${UDSConfig.ssoBaseUrl}/realms/uds/protocol/openid-connect/certs`,
         },
       ],
     },
@@ -373,7 +373,7 @@ export {
   authserviceAuthorizationPolicy,
   computeMonitorExemptions,
   jwtAuthZAuthorizationPolicy,
-  updatePolicy,
+  updatePolicy
 };
 
 /**
