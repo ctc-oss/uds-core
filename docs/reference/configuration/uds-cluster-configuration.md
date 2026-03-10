@@ -18,6 +18,8 @@ cluster:
     # Domain configuration (admin defaults to `admin.UDS_DOMAIN`)
     domain: "###ZARF_VAR_DOMAIN###"
     adminDomain: "###ZARF_VAR_ADMIN_DOMAIN###"
+    # Optional explicit SSO base URL (defaults to https://sso.<domain>)
+    ssoBaseUrl: ""
     caCert: "###ZARF_VAR_CA_CERT###"
   policy:
     allowAllNsExemptions: "###ZARF_VAR_ALLOW_ALL_NS_EXEMPTIONS###"
@@ -28,7 +30,7 @@ cluster:
 
 ## Setting Values
 
-Some configurations, like `clusterName`, `clusterTags`, `kubeApiCIDR`, and `kubeNodeCIDRs`, can only be set by bundle overrides. All other values can be set either by bundle overrides or by setting the corresponding Zarf variable.
+Some configurations, like `clusterName`, `clusterTags`, `kubeApiCIDR`, `kubeNodeCIDRs`, and `ssoBaseUrl`, can only be set by bundle overrides unless you define your own bundle variable that maps to that values path. All other values can be set either by bundle overrides or by setting the corresponding Zarf variable.
 
 ### Example Bundle Overrides
 
@@ -47,6 +49,8 @@ packages:
                 - 172.28.0.2/32
                 - 172.28.0.3/32
                 - 172.28.0.4/32
+            - path: cluster.expose.ssoBaseUrl
+              value: https://login.my.domain
           variables:
             - name: CLUSTER_NAME
               path: cluster.attributes.clusterName

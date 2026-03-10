@@ -17,6 +17,7 @@ spec:
     adminDomain: ""
     caCert: ""
     domain: uds.dev
+    ssoBaseUrl: https://uds.dev/cge/sso
   networking:
     kubeApiCIDR: ""
     kubeNodeCIDRs: []
