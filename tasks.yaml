@@ -35,7 +35,7 @@ tasks:
         default: "127.0.0.1,localhost,.svc,.cluster.local,10.43.0.0/16,10.42.0.0/16,192.168.0.0/16"
       K3D_CA_CERT_PATH:
         description: "Host path to the proxy CA cert that should be mounted into the k3d nodes"
-        default: "/Users/snyderj/Zscaler-Root-CA.pem"
+        default: ""
       K3D_EXTRA_ARGS:
         description: "Additional uds-k3d deploy-time arguments"
         default: ""

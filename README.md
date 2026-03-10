@@ -95,6 +95,27 @@ npx pepr deploy --yes
 uds run dev-deploy --set LAYER=identity-authorization
 ```
 
+##### Configuring Proxy and CA Certificates
+
+If you're behind an HTTP proxy and need to configure your k3d cluster to use a custom CA certificate, you can customize the `dev-setup` task with the following options:
+
+- `K3D_PROXY_URL`: HTTP/HTTPS proxy URL (default: `http://host.docker.internal:9000`)
+- `K3D_NO_PROXY`: Comma-separated list of domains to bypass the proxy (default includes Kubernetes internal addresses)
+- `K3D_CA_CERT_PATH`: Host path to your CA certificate file (default: empty string - only required if using a proxy)
+- `K3D_EXTRA_ARGS`: Additional arguments to pass to k3d
+
+Example usage with a custom CA certificate:
+
+```bash
+uds run dev-setup --with K3D_CA_CERT_PATH=/path/to/your/ca.pem
+```
+
+To skip proxy configuration entirely:
+
+```bash
+uds run dev-setup --with K3D_PROXY_URL=""
+```
+
 #### Testing UDS Core
 
 You can perform a complete test of UDS Core by running the following command:

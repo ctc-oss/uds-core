@@ -33,7 +33,7 @@ tasks:
         default: "127.0.0.1,localhost,.internal,.docker,.ctc.com"
         description: "NO_PROXY value injected into all k3d nodes"
       K3D_CA_CERT_PATH:
-        default: "/Users/snyderj/Zscaler-Root-CA.pem"
+        default: ""
         description: "Path on the Docker host to the Zscaler root CA PEM mounted into all k3d nodes"
       K3D_EXTRA_ARGS:
         default: ""
@@ -44,6 +44,16 @@ tasks:
           darwin: bash
           linux: bash
         cmd: |
+          if [[ -z "${{ .inputs.K3D_CA_CERT_PATH }}" ]]; then
+            echo "Error: K3D_CA_CERT_PATH must be set for proxied k3d bundle deployments" >&2
+            exit 1
+          fi
+
+          if [[ ! -f "${{ .inputs.K3D_CA_CERT_PATH }}" ]]; then
+            echo "Error: K3D_CA_CERT_PATH does not exist or is not a file: ${{ .inputs.K3D_CA_CERT_PATH }}" >&2
+            exit 1
+          fi
+
           TMP_UDS_CONFIG=$(mktemp -t uds-proxy-config.XXXXXX.yaml)
           trap 'rm -f "$TMP_UDS_CONFIG"' EXIT
 
@@ -96,7 +106,7 @@ tasks:
         default: "127.0.0.1,localhost,.internal,.docker,.ctc.com"
         description: "NO_PROXY value injected into all k3d nodes"
       K3D_CA_CERT_PATH:
-        default: "/Users/snyderj/Zscaler-Root-CA.pem"
+        default: ""
         description: "Path on the Docker host to the Zscaler root CA PEM mounted into all k3d nodes"
       K3D_EXTRA_ARGS:
         default: ""
@@ -107,6 +117,16 @@ tasks:
           darwin: bash
           linux: bash
         cmd: |
+          if [[ -z "${{ .inputs.K3D_CA_CERT_PATH }}" ]]; then
+            echo "Error: K3D_CA_CERT_PATH must be set for proxied k3d bundle deployments" >&2
+            exit 1
+          fi
+
+          if [[ ! -f "${{ .inputs.K3D_CA_CERT_PATH }}" ]]; then
+            echo "Error: K3D_CA_CERT_PATH does not exist or is not a file: ${{ .inputs.K3D_CA_CERT_PATH }}" >&2
+            exit 1
+          fi
+
           TMP_UDS_CONFIG=$(mktemp -t uds-proxy-config.XXXXXX.yaml)
           trap 'rm -f "$TMP_UDS_CONFIG"' EXIT
 
