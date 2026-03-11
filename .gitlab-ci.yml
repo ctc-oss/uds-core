@@ -2,7 +2,7 @@ stages:
   - build
 
 default:
-  image: nexus.draco.lab:8083/uds-builder:latest
+  image: $UDS_BUILDER_IMAGE
   tags:
     - docker
 
