@@ -7,15 +7,15 @@ default:
     - docker
 
 variables:
-  BUILD_OPTIONS: --with CREATE_OPTIONS=--skip-sbom
+  BUILD_OPTIONS: --with create_options=--skip-sbom
 
 build:
   stage: build
   script: |
-    uds run create-standard-package $BUILD_OPTIONS
+    uds run create:standard-package $BUILD_OPTIONS
 
     find . -name "build/*.tar.zst" -print0 | while IFS= read -r -d '' pkg; do
-        echo "Uploading $pkg to Nexus"
+        echo "Uploading $pkg to Nexus: $NEXUS_BASE_URL/repository/files/uds-packages/"
         curl -f -u "$NEXUS_USERNAME:$NEXUS_PASSWORD" \
         --upload-file "$pkg" \
         "$NEXUS_BASE_URL/repository/files/uds-packages/$(basename "$pkg")"
