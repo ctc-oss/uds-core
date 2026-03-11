@@ -17,7 +17,7 @@ build:
     zarf tools registry login --username $NEXUS_USERNAME --password $NEXUS_PASSWORD $NEXUS_REGISTRY_URL
     find ./build -name "*.tar.zst" -print0 | while IFS= read -r -d '' pkg; do
         echo "Publishing $pkg to Nexus Registry: $NEXUS_BASE_URL"
-        zarf package publish "$pkg" $NEXUS_REGISTRY_URL/cge/packages/uds/core --confirm
+        zarf package publish "$pkg" oci://$NEXUS_REGISTRY_URL/cge/packages/uds/core --confirm
         # curl -f -u "$NEXUS_USERNAME:$NEXUS_PASSWORD" \
         # --upload-file "$pkg" \
         # "$NEXUS_BASE_URL/repository/files/uds-packages/$(basename "$pkg")"
