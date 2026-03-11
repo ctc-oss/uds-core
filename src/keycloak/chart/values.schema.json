@@ -209,6 +209,9 @@
     "adminDomain": {
       "type": "string"
     },
+    "ssoBaseUrl": {
+      "type": "string"
+    },
     "enableServiceLinks": {
       "type": "boolean"
     },

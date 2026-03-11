@@ -19,6 +19,10 @@ variables:
   - name: ADMIN_DOMAIN
     description: "Domain for admin services, defaults to `admin.DOMAIN`"
 
+  - name: SSO_BASE_URL
+    description: "Optional explicit SSO base URL, defaults to https://sso.DOMAIN"
+    default: ""
+
 components:
   - name: grafana
     required: true

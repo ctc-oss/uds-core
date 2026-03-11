@@ -2,6 +2,11 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-Defense-Unicorns-Commercial
 
 {{- if .Values.pathParameterProtection }}
+{{- $ssoHost := printf "sso.%s" .Values.domain }}
+{{- if .Values.ssoBaseUrl }}
+{{- $ssoUrlWithoutScheme := trimPrefix "https://" (trimPrefix "http://" .Values.ssoBaseUrl) }}
+{{- $ssoHost = first (splitList "/" $ssoUrlWithoutScheme) }}
+{{- end }}
 # Block use of `;` path parameters in non-final path segments
 # This prevents bypass of path-based authorization policies
 apiVersion: networking.istio.io/v1alpha3
@@ -31,7 +36,7 @@ spec:
 
                 -- Only apply to keycloak endpoints
                 if host and (
-                  host == "sso.{{ .Values.domain }}" or
+                  host == "{{ $ssoHost }}" or
                   host == "keycloak.{{ tpl .Values.adminDomain . }}"
                 ) then
                   if path then

@@ -19,6 +19,10 @@ variables:
   - name: ADMIN_DOMAIN
     description: "Domain for admin services, defaults to `admin.DOMAIN`"
 
+  - name: SSO_BASE_URL
+    description: "Optional explicit SSO base URL, defaults to https://sso.DOMAIN"
+    default: ""
+
   - name: KC_HTTP_RELATIVE_PATH
     description: "Relative path for Keycloak HTTP endpoint"
     default: "/cge/sso"
