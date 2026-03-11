@@ -12,6 +12,7 @@ variables:
 build:
   stage: build
   script: |
+    set -x
     uds run create:standard-package $BUILD_OPTIONS
     zarf tools registry login --username $NEXUS_USERNAME --password $NEXUS_PASSWORD $NEXUS_REGISTRY_URL
     find ./build -name "*.tar.zst" -print0 | while IFS= read -r -d '' pkg; do
