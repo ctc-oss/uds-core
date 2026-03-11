@@ -19,7 +19,7 @@ export async function getAdminToken(baseUrl: string): Promise<string> {
     throw new Error("Missing username or password keys in keycloak-admin-password secret");
   }
 
-  const tokenUrl = `${baseUrl}/realms/master/protocol/openid-connect/token`;
+  const tokenUrl = `${baseUrl}/cge/sso/realms/master/protocol/openid-connect/token`;
   const tokenResp = await fetch(tokenUrl, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -46,7 +46,7 @@ export async function createRandomClient(
   clientId: string,
   realm = "uds",
 ): Promise<string> {
-  const resp = await fetch(`${baseUrl}/admin/realms/${encodeURIComponent(realm)}/clients`, {
+  const resp = await fetch(`${baseUrl}/cge/sso/admin/realms/${encodeURIComponent(realm)}/clients`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -80,7 +80,7 @@ export async function createUser(
   const headersJson = { ...headersAuth, "Content-Type": "application/json" } as const;
 
   // Create the user (201 on create, 409 if it exists)
-  const createUserResp = await fetch(`${baseUrl}/admin/realms/${encodeURIComponent(realm)}/users`, {
+  const createUserResp = await fetch(`${baseUrl}/cge/sso/admin/realms/${encodeURIComponent(realm)}/users`, {
     method: "POST",
     headers: headersJson,
     body: JSON.stringify({ username, enabled: true }),
@@ -101,7 +101,7 @@ export async function createUser(
   // Fallback: query the user by username
   if (!userId) {
     const usersQuery = await fetch(
-      `${baseUrl}/admin/realms/${encodeURIComponent(realm)}/users?username=${encodeURIComponent(username)}&exact=true`,
+      `${baseUrl}/cge/sso/admin/realms/${encodeURIComponent(realm)}/users?username=${encodeURIComponent(username)}&exact=true`,
       { headers: headersAuth },
     );
     if (!usersQuery.ok) {
@@ -131,7 +131,7 @@ export async function addUserToGroup(
 
   // Resolve group id by path
   const groupResp = await fetch(
-    `${baseUrl}/admin/realms/${encodeURIComponent(realm)}/group-by-path/${encodeURIComponent(groupPath)}`,
+    `${baseUrl}/cge/sso/admin/realms/${encodeURIComponent(realm)}/group-by-path/${encodeURIComponent(groupPath)}`,
     { headers: headersAuth },
   );
 
@@ -147,7 +147,7 @@ export async function addUserToGroup(
 
   // Add membership (201/204 acceptable)
   const addGroupResp = await fetch(
-    `${baseUrl}/admin/realms/${encodeURIComponent(realm)}/users/${encodeURIComponent(userId)}/groups/${encodeURIComponent(group.id)}`,
+    `${baseUrl}/cge/sso/admin/realms/${encodeURIComponent(realm)}/users/${encodeURIComponent(userId)}/groups/${encodeURIComponent(group.id)}`,
     { method: "PUT", headers: headersAuth },
   );
 

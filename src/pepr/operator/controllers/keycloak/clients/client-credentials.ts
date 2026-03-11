@@ -19,8 +19,8 @@ export function parseKeycloakToken(token: string) {
   return JSON.parse(Buffer.from(token.split(".")[1], "base64").toString()) as KeycloakToken;
 }
 
-const clientsAdminUrl = `${baseUrl}/admin/realms/uds/clients`;
-const clientCredentialsUrl = `${baseUrl}/realms/uds/protocol/openid-connect/token`;
+const clientsAdminUrl = `${baseUrl}/cge/sso/admin/realms/uds/clients`;
+const clientCredentialsUrl = `${baseUrl}/cge/sso/realms/uds/protocol/openid-connect/token`;
 const SECRET_NAMESPACE = "keycloak";
 const SECRET_NAME = "keycloak-client-secrets";
 const UDS_OPERATOR_CLIENT_ID = "uds-operator";

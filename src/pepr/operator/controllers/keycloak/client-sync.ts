@@ -12,7 +12,7 @@ import { credentialsCreateOrUpdate, credentialsDelete } from "./clients/client-c
 import { Client, clientKeys } from "./types";
 
 const samlDescriptorUrl =
-  "http://keycloak-http.keycloak.svc.cluster.local:8080/realms/uds/protocol/saml/descriptor";
+  "http://keycloak-http.keycloak.svc.cluster.local:8080/cge/sso/realms/uds/protocol/saml/descriptor";
 
 // Template regex to match clientField() references, see https://regex101.com/r/e41Dsk/3 for details
 const secretTemplateRegex = new RegExp(
