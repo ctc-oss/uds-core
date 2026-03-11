@@ -16,6 +16,10 @@ variables:
     description: "Cluster domain"
     default: "uds.dev"
 
+  - name: SUBDOMAIN
+    description: "Optional subdomain for Grafana"
+    default: ""
+
   - name: ADMIN_DOMAIN
     description: "Domain for admin services, defaults to `admin.DOMAIN`"
 

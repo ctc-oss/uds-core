@@ -45,12 +45,12 @@ extraConfigmapMounts:
     subPath: ca-bundle.pem
     optional: true
 
-# ssoBaseUrl: "###ZARF_VAR_SSO_BASE_URL###"
-ssoBaseUrl: "https://cge.uds.dev/cge/sso"
+ssoBaseUrl: "###ZARF_VAR_SSO_BASE_URL###"
 
 grafana.ini:
   server:
-    root_url: https://grafana.{{ "###ZARF_VAR_ADMIN_DOMAIN###" | default "admin.###ZARF_VAR_DOMAIN###" }}
+    root_url: 'https://{{ "###ZARF_VAR_SUBDOMAIN###" | default "" }}.{{ "###ZARF_VAR_DOMAIN###" | default "uds.dev" }}/cge/admin/grafana'
+    serve_from_sub_path: true
   # Disable telemetry that doesn't function in the airgap
   analytics:
     reporting_enabled: false

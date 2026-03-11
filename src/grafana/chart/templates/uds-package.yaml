@@ -12,13 +12,8 @@ spec:
     - name: Grafana
       clientId: uds-core-admin-grafana
       redirectUris:
-        {{- if .Values.adminDomain }}
-        - "https://grafana.{{ .Values.adminDomain }}/login/generic_oauth"
-        - "https://grafana.{{ .Values.adminDomain }}/login"
-        {{- else }}
-        - "https://grafana.admin.{{ .Values.domain }}/login/generic_oauth"
-        - "https://grafana.admin.{{ .Values.domain }}/login"
-        {{- end }}
+        - "https://{{ .Values.subDomain }}.{{ .Values.domain }}/cge/admin/grafana/login/generic_oauth"
+        - "https://{{ .Values.subDomain }}.{{ .Values.domain }}/cge/admin/grafana/login"
       {{- if .Values.sso.groups }}
       groups:
         anyOf:
@@ -43,14 +38,22 @@ spec:
       - service: grafana
         selector:
           app.kubernetes.io/name: grafana
-        host: grafana
-        gateway: admin
+        host: {{ .Values.subDomain }}
+        gateway: tenant
         port: 80
         targetPort: 3000
         uptime:
           checks:
             paths:
               - /healthz # monitor the healthz path as all other paths redirect to keycloak
+        match:
+          - name: grafana-exact-match
+            uri:
+              exact: /cge/admin/grafana
+          - name: grafana-prefix-match
+            uri:
+              prefix: /cge/admin/grafana/
+
     # @lulaEnd 506992d2-64cf-4fb3-95de-40a8ad127626
 
     allow:
