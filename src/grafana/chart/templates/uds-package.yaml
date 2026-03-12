@@ -12,8 +12,8 @@ spec:
     - name: Grafana
       clientId: uds-core-admin-grafana
       redirectUris:
-        - "https://{{ .Values.subDomain }}.{{ .Values.domain }}/cge/admin/grafana/login/generic_oauth"
-        - "https://{{ .Values.subDomain }}.{{ .Values.domain }}/cge/admin/grafana/login"
+        - "https://{{ .Values.subdomain }}.{{ .Values.domain }}/cge/admin/grafana/login/generic_oauth"
+        - "https://{{ .Values.subdomain }}.{{ .Values.domain }}/cge/admin/grafana/login"
       {{- if .Values.sso.groups }}
       groups:
         anyOf:
@@ -38,7 +38,7 @@ spec:
       - service: grafana
         selector:
           app.kubernetes.io/name: grafana
-        host: {{ .Values.subDomain }}
+        host: {{ .Values.subdomain }}
         gateway: tenant
         port: 80
         targetPort: 3000

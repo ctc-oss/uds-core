@@ -203,7 +203,7 @@
     "domain": {
       "type": "string"
     },
-    "subDomain": {
+    "subdomain": {
       "type": "string"
     },
     "adminDomain": {
