@@ -8,7 +8,7 @@ import { fetch, K8s, kind } from "pepr";
 import { UDSConfig } from "../../config/config";
 import { KeycloakClientMode } from "../../config/types";
 import { Client } from "../types";
-import { baseUrl, isAuthError, log, throwErrorIfNeeded } from "./common";
+import { getBaseUrl, isAuthError, log, throwErrorIfNeeded } from "./common";
 
 export interface ClientWithId extends Client {
   id: string;
@@ -22,8 +22,13 @@ export function parseKeycloakToken(token: string) {
   return JSON.parse(Buffer.from(token.split(".")[1], "base64").toString()) as KeycloakToken;
 }
 
-const clientsAdminUrl = `${baseUrl}/admin/realms/uds/clients`;
-const clientCredentialsUrl = `${baseUrl}/realms/uds/protocol/openid-connect/token`;
+function getClientsAdminUrl() {
+  return `${getBaseUrl()}/admin/realms/uds/clients`;
+}
+
+function getClientCredentialsUrl() {
+  return `${getBaseUrl()}/realms/uds/protocol/openid-connect/token`;
+}
 const SECRET_NAMESPACE = "keycloak";
 const SECRET_NAME = "keycloak-client-secrets";
 export const UDS_OPERATOR_CLIENT_ID = "uds-operator";
@@ -81,7 +86,7 @@ export async function getClientSecretToken(): Promise<string> {
   params.append("client_id", UDS_OPERATOR_CLIENT_ID);
   params.append("client_secret", clientSecret);
 
-  const response = await fetch<KeycloakAccessTokenResponse>(clientCredentialsUrl, {
+  const response = await fetch<KeycloakAccessTokenResponse>(getClientCredentialsUrl(), {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: params.toString(),
@@ -97,7 +102,7 @@ export async function getSignedJwtToken(): Promise<string> {
   params.append("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
   params.append("client_assertion", saToken);
 
-  const response = await fetch<KeycloakAccessTokenResponse>(clientCredentialsUrl, {
+  const response = await fetch<KeycloakAccessTokenResponse>(getClientCredentialsUrl(), {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: params.toString(),
@@ -175,7 +180,7 @@ export async function credentialsCreateOrUpdate(client: Partial<Client>) {
 export async function credentialsCreate(client: Partial<Client>) {
   log.info(`credentialsCreate: creating client ${client.clientId}`);
   const token = await credentialsGetAccessToken();
-  const response = await fetch(clientsAdminUrl, {
+  const response = await fetch(getClientsAdminUrl(), {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
     body: JSON.stringify(client),
@@ -189,7 +194,7 @@ export async function credentialsCreate(client: Partial<Client>) {
 export async function credentialsGet(client: Partial<Client>) {
   log.info(`credentialsGet: retrieving client ${client.clientId}`);
   const token = await credentialsGetAccessToken();
-  const url = `${clientsAdminUrl}?clientId=${encodeURIComponent(client.clientId!)}`;
+  const url = `${getClientsAdminUrl()}?clientId=${encodeURIComponent(client.clientId!)}`;
   // There's no Client GET REST endpoint that obtains a client based on client_id (the logical client name, like uds-operator).
   // All Admin REST endpoints for client operator on the database Client ID, which is a UUID. The only interface that allows to
   // obtain the Client using the client_id is the collection interface which returns a singular collection with
@@ -211,7 +216,7 @@ export async function credentialsUpdate(client: Partial<Client>) {
   if (!existing || !existing.id) {
     throw new Error(`Failed to retrieve existing client, ${client.clientId}`);
   }
-  const url = `${clientsAdminUrl}/${encodeURIComponent(existing.id)}`;
+  const url = `${getClientsAdminUrl()}/${encodeURIComponent(existing.id)}`;
   const response = await fetch(url, {
     method: "PUT",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -230,7 +235,7 @@ export async function credentialsDelete(client: Partial<Client>) {
   if (!existing || !existing.id) {
     throw new Error(`Failed to retrieve existing client, ${client.clientId}`);
   }
-  const url = `${clientsAdminUrl}/${encodeURIComponent(existing.id)}`;
+  const url = `${getClientsAdminUrl()}/${encodeURIComponent(existing.id)}`;
   const response = await fetch(url, {
     method: "DELETE",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

@@ -23,6 +23,53 @@ tasks:
       - description: "Deploy the UDS Core Standard Bundle"
         cmd: ./uds deploy bundles/k3d-standard/uds-bundle-k3d-core-demo-${UDS_ARCH}-${VERSION}.tar.zst --set INSECURE_ADMIN_PASSWORD_GENERATION=true --set FALCO_SANDBOX_RULES_ENABLED=true --set FALCO_INCUBATING_RULES_ENABLED=true --set K3D_EXTRA_ARGS="${{ .inputs.K3D_EXTRA_ARGS }}" --confirm --no-progress
 
+  - name: k3d-standard-bundle-proxied
+    description: "Deploy the UDS Core Standard Bundle with k3d node proxy and Zscaler CA settings"
+    inputs:
+      K3D_PROXY_URL:
+        default: "http://host.docker.internal:9000"
+        description: "Proxy URL injected into all k3d nodes"
+      K3D_NO_PROXY:
+        default: "127.0.0.1,localhost,.internal,.docker,.ctc.com"
+        description: "NO_PROXY value injected into all k3d nodes"
+      K3D_CA_CERT_PATH:
+        default: ""
+        description: "Path on the Docker host to the Zscaler root CA PEM mounted into all k3d nodes"
+      K3D_EXTRA_ARGS:
+        default: ""
+        description: "Additional args for k3d"
+    actions:
+      - description: "Deploy the UDS Core Standard Bundle with proxy-aware k3d nodes"
+        shell:
+          darwin: bash
+          linux: bash
+        cmd: |
+          if [[ -z "${{ .inputs.K3D_CA_CERT_PATH }}" ]]; then
+            echo "Error: K3D_CA_CERT_PATH must be set for proxied k3d bundle deployments" >&2
+            exit 1
+          fi
+
+          if [[ ! -f "${{ .inputs.K3D_CA_CERT_PATH }}" ]]; then
+            echo "Error: K3D_CA_CERT_PATH does not exist or is not a file: ${{ .inputs.K3D_CA_CERT_PATH }}" >&2
+            exit 1
+          fi
+
+          TMP_UDS_CONFIG=$(mktemp -t uds-proxy-config.XXXXXX.yaml)
+          trap 'rm -f "$TMP_UDS_CONFIG"' EXIT
+
+          cat >"$TMP_UDS_CONFIG" <<EOF
+          variables:
+            uds-k3d-dev:
+              K3D_EXTRA_ARGS: "--volume ${{ .inputs.K3D_CA_CERT_PATH }}:/zscaler-root-ca.pem@all --env http_proxy=${{ .inputs.K3D_PROXY_URL }}@all --env https_proxy=${{ .inputs.K3D_PROXY_URL }}@all --env no_proxy=${{ .inputs.K3D_NO_PROXY }}@all --env HTTP_PROXY=${{ .inputs.K3D_PROXY_URL }}@all --env HTTPS_PROXY=${{ .inputs.K3D_PROXY_URL }}@all --env NO_PROXY=${{ .inputs.K3D_NO_PROXY }}@all --env SSL_CERT_FILE=/zscaler-root-ca.pem@all --env CURL_CA_BUNDLE=/zscaler-root-ca.pem@all --env REQUESTS_CA_BUNDLE=/zscaler-root-ca.pem@all --env GIT_SSL_CAINFO=/zscaler-root-ca.pem@all --env AWS_CA_BUNDLE=/zscaler-root-ca.pem@all --env NODE_EXTRA_CA_CERTS=/zscaler-root-ca.pem@all ${{ .inputs.K3D_EXTRA_ARGS }}"
+            core:
+              INSECURE_ADMIN_PASSWORD_GENERATION: true
+              FALCO_SANDBOX_RULES_ENABLED: true
+              FALCO_INCUBATING_RULES_ENABLED: true
+          EOF
+
+          export UDS_CONFIG="$TMP_UDS_CONFIG"
+          ./uds deploy bundles/k3d-standard/uds-bundle-k3d-core-demo-${UDS_ARCH}-${VERSION}.tar.zst --confirm --no-progress
+
   - name: k3d-standard-bundle-ha
     actions:
       - description: "Deploy the UDS Core Standard Bundle"
@@ -52,9 +99,56 @@ tasks:
           - UDS_CONFIG=build/private-pki/uds-private-pki-config.yaml
 
   - name: k3d-slim-dev-bundle
+    inputs:
+      K3D_EXTRA_ARGS:
+        default: ""
+        description: "Extra args for k3d"
     actions:
       - description: "Deploy the UDS Core Slim Dev Only Bundle"
-        cmd: ./uds deploy bundles/k3d-slim-dev/uds-bundle-k3d-core-slim-dev-${UDS_ARCH}-${VERSION}.tar.zst --confirm --no-progress
+        cmd: ./uds deploy bundles/k3d-slim-dev/uds-bundle-k3d-core-slim-dev-${UDS_ARCH}-${VERSION}.tar.zst --set K3D_EXTRA_ARGS="${{ .inputs.K3D_EXTRA_ARGS }}" --confirm --no-progress
+
+  - name: k3d-slim-dev-bundle-proxied
+    description: "Deploy the UDS Core Slim Dev Bundle with k3d node proxy and Zscaler CA settings"
+    inputs:
+      K3D_PROXY_URL:
+        default: "http://host.docker.internal:9000"
+        description: "Proxy URL injected into all k3d nodes"
+      K3D_NO_PROXY:
+        default: "127.0.0.1,localhost,.internal,.docker,.ctc.com"
+        description: "NO_PROXY value injected into all k3d nodes"
+      K3D_CA_CERT_PATH:
+        default: ""
+        description: "Path on the Docker host to the Zscaler root CA PEM mounted into all k3d nodes"
+      K3D_EXTRA_ARGS:
+        default: ""
+        description: "Additional args for k3d"
+    actions:
+      - description: "Deploy the UDS Core Slim Dev Bundle with proxy-aware k3d nodes"
+        shell:
+          darwin: bash
+          linux: bash
+        cmd: |
+          if [[ -z "${{ .inputs.K3D_CA_CERT_PATH }}" ]]; then
+            echo "Error: K3D_CA_CERT_PATH must be set for proxied k3d bundle deployments" >&2
+            exit 1
+          fi
+
+          if [[ ! -f "${{ .inputs.K3D_CA_CERT_PATH }}" ]]; then
+            echo "Error: K3D_CA_CERT_PATH does not exist or is not a file: ${{ .inputs.K3D_CA_CERT_PATH }}" >&2
+            exit 1
+          fi
+
+          TMP_UDS_CONFIG=$(mktemp -t uds-proxy-config.XXXXXX.yaml)
+          trap 'rm -f "$TMP_UDS_CONFIG"' EXIT
+
+          cat >"$TMP_UDS_CONFIG" <<EOF
+          variables:
+            uds-k3d-dev:
+              K3D_EXTRA_ARGS: "--volume ${{ .inputs.K3D_CA_CERT_PATH }}:/zscaler-root-ca.pem@all --env http_proxy=${{ .inputs.K3D_PROXY_URL }}@all --env https_proxy=${{ .inputs.K3D_PROXY_URL }}@all --env no_proxy=${{ .inputs.K3D_NO_PROXY }}@all --env HTTP_PROXY=${{ .inputs.K3D_PROXY_URL }}@all --env HTTPS_PROXY=${{ .inputs.K3D_PROXY_URL }}@all --env NO_PROXY=${{ .inputs.K3D_NO_PROXY }}@all --env SSL_CERT_FILE=/zscaler-root-ca.pem@all --env CURL_CA_BUNDLE=/zscaler-root-ca.pem@all --env REQUESTS_CA_BUNDLE=/zscaler-root-ca.pem@all --env GIT_SSL_CAINFO=/zscaler-root-ca.pem@all --env AWS_CA_BUNDLE=/zscaler-root-ca.pem@all --env NODE_EXTRA_CA_CERTS=/zscaler-root-ca.pem@all ${{ .inputs.K3D_EXTRA_ARGS }}"
+          EOF
+
+          export UDS_CONFIG="$TMP_UDS_CONFIG"
+          uds deploy bundles/k3d-slim-dev/uds-bundle-k3d-core-slim-dev-${UDS_ARCH}-${VERSION}.tar.zst --confirm --no-progress
 
   - name: k3d-slim-dev-bundle-ha
     actions:

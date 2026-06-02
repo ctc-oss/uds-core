@@ -38,7 +38,7 @@ export function initializeOperatorConfig() {
   operatorConfig = {
     namespace: "authservice",
     secretName: "authservice-uds",
-    baseDomain: `https://sso.${UDSConfig.domain}`,
+    baseDomain: UDSConfig.ssoBaseUrl,
     realm: "uds",
   };
 
@@ -94,10 +94,10 @@ export function buildInitialSecret(): AuthserviceConfig {
     log_level: "info",
     default_oidc_config: {
       skip_verify_peer_cert: false,
-      authorization_uri: `https://sso.${UDSConfig.domain}/realms/${operatorConfig.realm}/protocol/openid-connect/auth`,
-      token_uri: `https://sso.${UDSConfig.domain}/realms/${operatorConfig.realm}/protocol/openid-connect/token`,
+      authorization_uri: `${UDSConfig.ssoBaseUrl}/realms/${operatorConfig.realm}/protocol/openid-connect/auth`,
+      token_uri: `${UDSConfig.ssoBaseUrl}/realms/${operatorConfig.realm}/protocol/openid-connect/token`,
       jwks_fetcher: {
-        jwks_uri: `https://sso.${UDSConfig.domain}/realms/${operatorConfig.realm}/protocol/openid-connect/certs`,
+        jwks_uri: `${UDSConfig.ssoBaseUrl}/realms/${operatorConfig.realm}/protocol/openid-connect/certs`,
         periodic_fetch_interval_sec: 60,
       },
       client_id: "global_id",
@@ -109,7 +109,7 @@ export function buildInitialSecret(): AuthserviceConfig {
       trusted_certificate_authority: buildCABundleContent(),
       logout: {
         path: "/globallogout",
-        redirect_uri: `https://sso.${UDSConfig.domain}/realms/${operatorConfig.realm}/protocol/openid-connect/token/logout`,
+        redirect_uri: `${UDSConfig.ssoBaseUrl}/realms/${operatorConfig.realm}/protocol/openid-connect/token/logout`,
       },
       absolute_session_timeout: "0",
       idle_session_timeout: "0",

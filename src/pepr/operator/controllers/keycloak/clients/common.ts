@@ -4,14 +4,30 @@
  */
 
 import { Component, setupLogger } from "../../../../logger";
+import { UDSConfig } from "../../config/config";
 
-export let baseUrl = "http://keycloak-http.keycloak.svc.cluster.local:8080";
-// Support dev mode with port-forwarded keycloak svc
-if (process.env.PEPR_MODE === "dev") {
-  baseUrl = "http://localhost:8080";
-}
+const internalBaseUrl =
+  process.env.PEPR_MODE === "dev"
+    ? "http://localhost:8080"
+    : "http://keycloak-http.keycloak.svc.cluster.local:8080";
 
 export const log = setupLogger(Component.OPERATOR_KEYCLOAK);
+
+export function getBaseUrl() {
+  const ssoBaseUrl = UDSConfig.ssoBaseUrl || "";
+  if (!ssoBaseUrl || ssoBaseUrl.includes("###ZARF_VAR")) {
+    return internalBaseUrl;
+  }
+
+  try {
+    const path = new URL(ssoBaseUrl).pathname.replace(/\/+$/, "");
+    const prefix = !path || path === "/" ? "" : path;
+    return `${internalBaseUrl}${prefix}`;
+  } catch {
+    // Keep operator calls functional even if a malformed URL is provided.
+    return internalBaseUrl;
+  }
+}
 
 export interface RestResponse {
   ok: boolean;

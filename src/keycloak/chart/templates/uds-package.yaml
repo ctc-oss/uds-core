@@ -127,7 +127,7 @@ spec:
     # @lulaStart 506992d2-64cf-4fb3-95de-40a8ad127626
     expose:
       - description: "remove private paths from public gateway"
-        host: sso
+        host: {{ .Values.subdomain }}
         service: keycloak-http
         selector:
           app.kubernetes.io/name: keycloak
@@ -136,14 +136,17 @@ spec:
         uptime:
           checks:
             paths:
-              - /
-              - /realms/uds/.well-known/openid-configuration
+              - /cge/sso
+              - /cge/sso/realms/uds/.well-known/openid-configuration
         {{- end }}
         advancedHTTP:
           match:
             - name: redirect-welcome
               uri:
                 exact: /
+            - name: redirect-welcome-base-path
+              uri:
+                exact: /cge/sso
             - name: redirect-admin
               uri:
                 prefix: /admin
@@ -153,8 +156,11 @@ spec:
             - name: redirect-metrics
               uri:
                 prefix: /metrics
+            - name: redirect-metrics-base-path
+              uri:
+                prefix: /cge/sso/metrics
           redirect:
-            uri: "/realms/{{ .Values.realm }}/account"
+            uri: "/cge/sso/realms/{{ .Values.realm }}/account"
           {{- if not .Values.thirdPartyIntegration.tls.tlsCertificateHeader }}
           headers:
             request:
@@ -168,7 +174,7 @@ spec:
         service: keycloak-http
         selector:
           app.kubernetes.io/name: keycloak
-        host: sso
+        host: {{ .Values.subdomain }}
         port: 8080
         {{- if not .Values.thirdPartyIntegration.tls.tlsCertificateHeader }}
         advancedHTTP:
@@ -184,8 +190,8 @@ spec:
         service: keycloak-http
         selector:
           app.kubernetes.io/name: keycloak
-        gateway: admin
-        host: keycloak
+        gateway: tenant
+        host: {{ .Values.subdomain }}
         port: 8080
         {{- if .Values.uptime.enabled }}
         uptime:
@@ -193,8 +199,17 @@ spec:
             paths:
               - /
         {{- end }}
-        {{- if not .Values.thirdPartyIntegration.tls.tlsCertificateHeader }}
         advancedHTTP:
+          match:
+            - name: keycloak-admin-exact-match
+              uri:
+                exact: /cge/admin/keycloak
+            - name: keycloak-admin-prefix-match
+              uri:
+                prefix: /cge/admin/keycloak/
+          redirect:
+            uri: /cge/sso/admin/master/console
+        {{- if not .Values.thirdPartyIntegration.tls.tlsCertificateHeader }}
           headers:
             request:
               remove:

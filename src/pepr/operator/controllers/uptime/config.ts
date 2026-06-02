@@ -60,7 +60,7 @@ export async function updateBlackboxConfig(
       Object.entries(currentConfig.modules).filter(([name]) => !name.startsWith(namespacePrefix)),
     );
 
-    const tokenUrl = `https://sso.${UDSConfig.domain}/realms/uds/protocol/openid-connect/token`;
+    const tokenUrl = `${UDSConfig.ssoBaseUrl}/realms/uds/protocol/openid-connect/token`;
 
     // Regenerate SSO modules for each probe client in this namespace
     for (const { clientId, secret: clientSecret } of probeClients) {

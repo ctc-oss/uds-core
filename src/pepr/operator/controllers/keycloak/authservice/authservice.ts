@@ -268,15 +268,15 @@ export function buildChain(update: AuthServiceEvent) {
     filters: [
       {
         oidc_override: {
-          authorization_uri: `https://sso.${UDSConfig.domain}/realms/${operatorConfig.realm}/protocol/openid-connect/auth`,
-          token_uri: `https://sso.${UDSConfig.domain}/realms/${operatorConfig.realm}/protocol/openid-connect/token`,
+          authorization_uri: `${UDSConfig.ssoBaseUrl}/realms/${operatorConfig.realm}/protocol/openid-connect/auth`,
+          token_uri: `${UDSConfig.ssoBaseUrl}/realms/${operatorConfig.realm}/protocol/openid-connect/token`,
           callback_uri: update.client!.redirectUris[0],
           client_id: update.client!.clientId,
           client_secret: update.client!.secret,
           scopes: [],
           logout: {
             path: "/logout",
-            redirect_uri: `https://sso.${UDSConfig.domain}/realms/${operatorConfig.realm}/protocol/openid-connect/logout`,
+            redirect_uri: `${UDSConfig.ssoBaseUrl}/realms/${operatorConfig.realm}/protocol/openid-connect/logout`,
           },
           cookie_name_prefix: update.client!.clientId,
         },

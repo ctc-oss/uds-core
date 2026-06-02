@@ -3,10 +3,55 @@
 
 tasks:
   - name: create-k3d-cluster
+    inputs:
+      K3D_PROXY_URL:
+        description: "HTTP/HTTPS proxy to inject into the k3d nodes"
+        default: ""
+      K3D_NO_PROXY:
+        description: "Comma separated no_proxy value to inject into the k3d nodes"
+        default: "127.0.0.1,localhost,.svc,.cluster.local,10.43.0.0/16,10.42.0.0/16,192.168.0.0/16"
+      K3D_CA_CERT_PATH:
+        description: "Host path to the proxy CA cert that should be mounted into the k3d nodes"
+        default: ""
+      K3D_EXTRA_ARGS:
+        description: "Additional uds-k3d deploy-time arguments"
+        default: ""
     actions:
       - description: "Create the K3d cluster"
         # renovate: datasource=docker depName=ghcr.io/defenseunicorns/packages/uds-k3d versioning=docker
-        cmd: "./uds zarf package deploy oci://defenseunicorns/uds-k3d:0.20.0-airgap --confirm"
+        cmd: |
+          FINAL_K3D_EXTRA_ARGS="${{ .inputs.K3D_EXTRA_ARGS }}"
+
+          if [[ -n "${{ .inputs.K3D_PROXY_URL }}" ]]; then
+            if [[ -z "${{ .inputs.K3D_CA_CERT_PATH }}" ]]; then
+              echo "Error: K3D_CA_CERT_PATH must be set when K3D_PROXY_URL is provided" >&2
+              exit 1
+            fi
+
+            if [[ ! -f "${{ .inputs.K3D_CA_CERT_PATH }}" ]]; then
+              echo "Error: K3D_CA_CERT_PATH does not exist or is not a file: ${{ .inputs.K3D_CA_CERT_PATH }}" >&2
+              exit 1
+            fi
+
+            FINAL_K3D_EXTRA_ARGS="--volume ${{ .inputs.K3D_CA_CERT_PATH }}:/zscaler-root-ca.pem@all --env http_proxy=${{ .inputs.K3D_PROXY_URL }}@all --env https_proxy=${{ .inputs.K3D_PROXY_URL }}@all --env no_proxy=${{ .inputs.K3D_NO_PROXY }}@all --env HTTP_PROXY=${{ .inputs.K3D_PROXY_URL }}@all --env HTTPS_PROXY=${{ .inputs.K3D_PROXY_URL }}@all --env NO_PROXY=${{ .inputs.K3D_NO_PROXY }}@all --env SSL_CERT_FILE=/zscaler-root-ca.pem@all --env CURL_CA_BUNDLE=/zscaler-root-ca.pem@all --env REQUESTS_CA_BUNDLE=/zscaler-root-ca.pem@all --env GIT_SSL_CAINFO=/zscaler-root-ca.pem@all --env AWS_CA_BUNDLE=/zscaler-root-ca.pem@all --env NODE_EXTRA_CA_CERTS=/zscaler-root-ca.pem@all ${FINAL_K3D_EXTRA_ARGS}"
+          fi
+
+          if [[ -z "$FINAL_K3D_EXTRA_ARGS" ]]; then
+            ./uds zarf package deploy oci://defenseunicorns/uds-k3d:0.20.0-airgap --confirm
+            exit 0
+          fi
+
+          TMP_ZARF_CONFIG=$(mktemp /tmp/zarf-k3d-config-XXXXXX.yaml)
+          trap 'rm -f "$TMP_ZARF_CONFIG"' EXIT
+
+          cat > "$TMP_ZARF_CONFIG" <<-EOF
+            package:
+              deploy:
+                set:
+                  K3D_EXTRA_ARGS: "$FINAL_K3D_EXTRA_ARGS"
+          EOF
+
+          ZARF_CONFIG="$TMP_ZARF_CONFIG" ./uds zarf package deploy oci://defenseunicorns/uds-k3d:0.20.0-airgap --confirm
 
   - name: k3d-test-cluster
     actions:
