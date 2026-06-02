@@ -18,7 +18,7 @@ variables:
 
   - name: SUBDOMAIN
     description: "Optional subdomain for Keycloak"
-    default: ""
+    default: "cge"
 
   - name: ADMIN_DOMAIN
     description: "Domain for admin services, defaults to `admin.DOMAIN`"

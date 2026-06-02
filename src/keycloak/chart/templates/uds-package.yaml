@@ -136,6 +136,7 @@ spec:
         uptime:
           checks:
             paths:
+              - /
               - /cge/sso
               - /cge/sso/realms/uds/.well-known/openid-configuration
         {{- end }}
@@ -193,12 +194,6 @@ spec:
         gateway: tenant
         host: {{ .Values.subdomain }}
         port: 8080
-        {{- if .Values.uptime.enabled }}
-        uptime:
-          checks:
-            paths:
-              - /
-        {{- end }}
         advancedHTTP:
           match:
             - name: keycloak-admin-exact-match
