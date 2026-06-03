@@ -20,6 +20,7 @@ export enum KeycloakClientMode {
 export type Config = {
   domain: string;
   adminDomain: string;
+  ssoBaseUrl: string;
   caBundle: CABundle;
   authserviceRedisUri: string;
   keycloakClientMode: KeycloakClientMode;

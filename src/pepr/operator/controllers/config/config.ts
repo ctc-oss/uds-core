@@ -22,10 +22,13 @@ import { Config, KeycloakClientMode } from "./types";
 
 export const configLog = setupLogger(Component.OPERATOR_CONFIG);
 
+const SSO_BASE_URL_PLACEHOLDER = "###ZARF_VAR_SSO_BASE_URL###";
+
 // Set default UDSConfig for build time compiling
 export const UDSConfig: Config = {
   domain: "",
   adminDomain: "",
+  ssoBaseUrl: "",
   caBundle: {
     certs: "",
     includeDoDCerts: false,
@@ -371,6 +374,12 @@ export async function handleCfg(cfg: ClusterConfig, action: ConfigAction) {
         UDSConfig.adminDomain = `admin.${UDSConfig.domain}`;
       }
       // todo: Add logic to handle domain changes and update across virtualservices, authservice config, etc
+    }
+
+    if (expose.ssoBaseUrl && expose.ssoBaseUrl !== SSO_BASE_URL_PLACEHOLDER) {
+      UDSConfig.ssoBaseUrl = expose.ssoBaseUrl;
+    } else {
+      UDSConfig.ssoBaseUrl = `https://sso.${UDSConfig.domain}`;
     }
 
     // Update other config values (no need for special handling)

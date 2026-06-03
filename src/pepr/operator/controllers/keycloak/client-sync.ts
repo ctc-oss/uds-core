@@ -9,10 +9,12 @@ import { Component, setupLogger } from "../../../logger";
 import { Sso, UDSPackage } from "../../crd";
 import { getOwnerRef, purgeOrphans, sanitizeResourceName } from "../utils";
 import { credentialsCreateOrUpdate, credentialsDelete } from "./clients/client-credentials";
+import { getBaseUrl } from "./clients/common";
 import { Client, clientKeys } from "./types";
 
-const samlDescriptorUrl =
-  "http://keycloak-http.keycloak.svc.cluster.local:8080/realms/uds/protocol/saml/descriptor";
+function getSamlDescriptorUrl() {
+  return `${getBaseUrl()}/realms/uds/protocol/saml/descriptor`;
+}
 
 // Template regex to match clientField() references, see https://regex101.com/r/e41Dsk/3 for details
 const secretTemplateRegex = new RegExp(
@@ -238,7 +240,7 @@ export function generateSecretData(client: Client, secretTemplate?: { [key: stri
 }
 
 export async function getSamlCertificate() {
-  const resp = await fetch<string>(samlDescriptorUrl);
+  const resp = await fetch<string>(getSamlDescriptorUrl());
 
   if (!resp.ok) {
     return undefined;

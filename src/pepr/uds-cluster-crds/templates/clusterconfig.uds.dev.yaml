@@ -106,6 +106,16 @@ spec:
                       description: >-
                         Domain all cluster services on the admin gateway will be
                         exposed on
+                    caCert:
+                      type: string
+                      description: >-
+                        The trusted CA that signed your domain certificates if
+                        using Private PKI
+                    ssoBaseUrl:
+                      type: string
+                      description: >-
+                        Optional explicit base URL for the SSO provider.
+                        Defaults to https://sso.<domain>
                   required:
                     - domain
                 policy:

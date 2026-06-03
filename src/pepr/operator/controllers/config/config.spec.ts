@@ -12,7 +12,6 @@ import { reconcileAuthservice } from "../keycloak/authservice/authservice";
 import { Action } from "../keycloak/authservice/types";
 import { initAPIServerCIDR } from "../network/generators/kubeAPI";
 import { initAllNodesTarget } from "../network/generators/kubeNodes";
-import { KeycloakClientMode } from "./types";
 import {
   ConfigAction,
   ConfigStep,
@@ -27,6 +26,7 @@ import {
   shouldSkip,
   shouldUpdateClusterResources,
 } from "./config";
+import { KeycloakClientMode } from "./types";
 
 // Mock dependencies
 const mockClusterConfGet = vi.fn();
@@ -160,14 +160,22 @@ const defaultSecret: kind.Secret = {
   },
 };
 
+function createMockCfg(): ClusterConfig {
+  return structuredClone(defaultConfig);
+}
+
+function createMockSecret(): kind.Secret {
+  return structuredClone(defaultSecret);
+}
+
 describe("initial config load", () => {
   beforeEach(() => {
     process.env.PEPR_WATCH_MODE = "true";
     process.env.PEPR_MODE = "dev";
     vi.clearAllMocks();
     mockBuildCABundleContent.mockReturnValue("");
-    mockCfg = defaultConfig;
-    mockSecret = defaultSecret;
+    mockCfg = createMockCfg();
+    mockSecret = createMockSecret();
     mockClusterConfGet.mockResolvedValue(mockCfg);
     mockSecretGet.mockResolvedValue(mockSecret);
     mockConfigMapGet.mockResolvedValue({
@@ -186,6 +194,7 @@ describe("initial config load", () => {
     expect(UDSConfig.kubeNodeCIDRs).toStrictEqual(["mock-node-cidrs"]);
     expect(UDSConfig.domain).toBe("mock-domain");
     expect(UDSConfig.adminDomain).toBe("mock-admin-domain");
+    expect(UDSConfig.ssoBaseUrl).toBe("https://sso.mock-domain");
     expect(UDSConfig.allowAllNSExemptions).toBe(true);
     expect(UDSConfig.authserviceRedisUri).toBe("mock-redis-uri");
   });
@@ -406,8 +415,8 @@ describe("handleUDSConfig", () => {
   beforeEach(() => {
     // Reset mocks
     vi.clearAllMocks();
-    mockCfg = defaultConfig;
-    mockSecret = defaultSecret;
+    mockCfg = createMockCfg();
+    mockSecret = createMockSecret();
     mockClusterConfGet.mockResolvedValue(mockCfg);
     mockSecretGet.mockResolvedValue(mockSecret);
     UDSConfig.caBundle.certs = "";
@@ -418,6 +427,7 @@ describe("handleUDSConfig", () => {
     UDSConfig.kubeNodeCIDRs = [];
     UDSConfig.domain = "uds.dev";
     UDSConfig.adminDomain = "";
+    UDSConfig.ssoBaseUrl = "";
     UDSConfig.allowAllNSExemptions = false;
     process.env.PEPR_WATCH_MODE = "true";
     process.env.PEPR_MODE = "dev";
@@ -437,6 +447,7 @@ describe("handleUDSConfig", () => {
     expect(UDSConfig.kubeNodeCIDRs).toStrictEqual(["mock-node-cidrs"]);
     expect(UDSConfig.domain).toBe("mock-domain");
     expect(UDSConfig.adminDomain).toBe("mock-admin-domain");
+    expect(UDSConfig.ssoBaseUrl).toBe("https://sso.mock-domain");
     expect(UDSConfig.allowAllNSExemptions).toBe(true);
   });
 
@@ -671,6 +682,35 @@ describe("handleUDSConfig", () => {
 
     expect(UDSConfig.domain).toBe("uds.dev");
     expect(UDSConfig.adminDomain).toBe("admin.uds.dev");
+    expect(UDSConfig.ssoBaseUrl).toBe("https://sso.uds.dev");
+  });
+
+  it("uses an explicit ssoBaseUrl when provided", async () => {
+    mockCfg.spec!.expose.ssoBaseUrl = "https://login.example.mil";
+
+    await handleCfg(mockCfg, ConfigAction.LOAD);
+
+    expect(UDSConfig.ssoBaseUrl).toBe("https://login.example.mil");
+  });
+
+  it("falls back to derived ssoBaseUrl when placeholder is provided", async () => {
+    mockCfg.spec!.expose.ssoBaseUrl = "###ZARF_VAR_SSO_BASE_URL###";
+
+    await handleCfg(mockCfg, ConfigAction.LOAD);
+
+    expect(UDSConfig.ssoBaseUrl).toBe("https://sso.mock-domain");
+  });
+
+  it("recomputes derived ssoBaseUrl when the domain changes", async () => {
+    UDSConfig.domain = "old-domain";
+    UDSConfig.ssoBaseUrl = "https://sso.old-domain";
+    mockCfg.spec!.expose.domain = "new-domain";
+    mockCfg.spec!.expose.adminDomain = "admin.new-domain";
+    mockCfg.spec!.expose.ssoBaseUrl = undefined;
+
+    await handleCfg(mockCfg, ConfigAction.UPDATE);
+
+    expect(UDSConfig.ssoBaseUrl).toBe("https://sso.new-domain");
   });
 
   it("does not call unnecessary updates if no values change", async () => {
@@ -727,11 +767,9 @@ describe("handleUDSConfig", () => {
   describe("CA Bundle ConfigMaps update logic", () => {
     beforeEach(() => {
       vi.clearAllMocks();
-      mockCfg = {
-        ...defaultConfig,
-        metadata: { ...defaultConfig.metadata, generation: 2 },
-        status: { observedGeneration: 1 },
-      };
+      mockCfg = createMockCfg();
+      mockCfg.metadata = { ...mockCfg.metadata, generation: 2 };
+      mockCfg.status = { observedGeneration: 1 };
       mockClusterConfGet.mockResolvedValue(mockCfg);
       mockSecretGet.mockResolvedValue(mockSecret);
       mockConfigMapGet.mockResolvedValue({
@@ -798,11 +836,9 @@ describe("handleUDSConfig", () => {
   describe("DoD/Public cert loading logic", () => {
     beforeEach(() => {
       vi.clearAllMocks();
-      mockCfg = {
-        ...defaultConfig,
-        metadata: { ...defaultConfig.metadata, generation: 2 },
-        status: { observedGeneration: 1 },
-      };
+      mockCfg = createMockCfg();
+      mockCfg.metadata = { ...mockCfg.metadata, generation: 2 };
+      mockCfg.status = { observedGeneration: 1 };
       mockClusterConfGet.mockResolvedValue(mockCfg);
       mockSecretGet.mockResolvedValue(mockSecret);
       UDSConfig.caBundle.certs = "";
@@ -942,11 +978,9 @@ describe("handleUDSConfig", () => {
       vi.clearAllMocks();
       mockPatchStatus.mockResolvedValue({});
 
-      mockCfg = {
-        ...defaultConfig,
-        metadata: { ...defaultConfig.metadata, generation: 2 },
-        status: { observedGeneration: 1 },
-      };
+      mockCfg = createMockCfg();
+      mockCfg.metadata = { ...mockCfg.metadata, generation: 2 };
+      mockCfg.status = { observedGeneration: 1 };
       mockClusterConfGet.mockResolvedValue(mockCfg);
       mockSecretGet.mockResolvedValue(mockSecret);
       mockConfigMapGet.mockResolvedValue({
@@ -1001,6 +1035,30 @@ describe("handleUDSConfig", () => {
     });
   });
 
+  describe("Legacy CA cert placeholder handling", () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+      mockCfg = createMockCfg();
+      mockCfg.metadata = { ...mockCfg.metadata, generation: 2 };
+      mockCfg.status = { observedGeneration: 1 };
+      mockClusterConfGet.mockResolvedValue(mockCfg);
+      mockSecretGet.mockResolvedValue(mockSecret);
+      mockConfigMapGet.mockResolvedValue({
+        data: { dodCACerts: "", publicCACerts: "" },
+      });
+      mockPatchStatus.mockResolvedValue({});
+    });
+
+    it("handles legacy ###ZARF_VAR_CA_CERT### placeholder", async () => {
+      mockCfg.spec!.caBundle!.certs = "###ZARF_VAR_CA_CERT###";
+      UDSConfig.caBundle.certs = "old-cert";
+
+      await handleCfg(mockCfg, ConfigAction.UPDATE);
+
+      expect(UDSConfig.caBundle.certs).toBe("");
+    });
+  });
+
   describe("loadUDSConfig pre-fetch logic", () => {
     beforeEach(() => {
       vi.clearAllMocks();
@@ -1011,7 +1069,7 @@ describe("handleUDSConfig", () => {
     });
 
     it("pre-fetches DoD/Public certs from uds-ca-certs ConfigMap", async () => {
-      mockClusterConfGet.mockResolvedValue(defaultConfig);
+      mockClusterConfGet.mockResolvedValue(createMockCfg());
       mockSecretGet.mockResolvedValue(mockSecret);
       mockConfigMapGet.mockResolvedValue({
         data: {
@@ -1028,7 +1086,7 @@ describe("handleUDSConfig", () => {
     });
 
     it("continues with empty certs if uds-ca-certs is not found", async () => {
-      mockClusterConfGet.mockResolvedValue(defaultConfig);
+      mockClusterConfGet.mockResolvedValue(createMockCfg());
       mockSecretGet.mockResolvedValue(mockSecret);
       mockConfigMapGet.mockRejectedValue({ status: 404 });
 
@@ -1040,7 +1098,7 @@ describe("handleUDSConfig", () => {
     });
 
     it("throws error if fetchCACerts fails with non-404 error", async () => {
-      mockClusterConfGet.mockResolvedValue(defaultConfig);
+      mockClusterConfGet.mockResolvedValue(createMockCfg());
       mockSecretGet.mockResolvedValue(mockSecret);
       mockConfigMapGet.mockRejectedValue(new Error("K8s API error"));
 

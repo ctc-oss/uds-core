@@ -41,5 +41,11 @@ spec:
     {{- else }}
     adminDomain: "admin.{{ .Values.cluster.expose.domain }}"
     {{- end }}
+    {{- if .Values.cluster.expose.ssoBaseUrl }}
+    ssoBaseUrl: {{ .Values.cluster.expose.ssoBaseUrl | quote }}
+    {{- end }}
+    {{- if .Values.cluster.expose.caCert }}
+    caCert: {{ .Values.cluster.expose.caCert | quote }}
+    {{- end }}
   policy:
     allowAllNsExemptions: {{ .Values.cluster.policy.allowAllNsExemptions }}

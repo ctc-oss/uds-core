@@ -16,8 +16,20 @@ variables:
     description: "Cluster domain"
     default: "uds.dev"
 
+  - name: SUBDOMAIN
+    description: "Optional subdomain for Keycloak"
+    default: "cge"
+
   - name: ADMIN_DOMAIN
     description: "Domain for admin services, defaults to `admin.DOMAIN`"
+
+  - name: SSO_BASE_URL
+    description: "Optional explicit SSO base URL, defaults to https://sso.DOMAIN"
+    default: ""
+
+  - name: KC_HTTP_RELATIVE_PATH
+    description: "Relative path for Keycloak HTTP endpoint"
+    default: "/cge/sso"
 
 components:
   - name: keycloak
@@ -29,6 +41,7 @@ components:
     charts:
       - name: keycloak
         valuesFiles:
+          - "values/common-values.yaml"
           - "values/upstream-values.yaml"
     images:
       - quay.io/keycloak/keycloak:26.6.2
@@ -43,6 +56,7 @@ components:
     charts:
       - name: keycloak
         valuesFiles:
+          - "values/common-values.yaml"
           - "values/registry1-values.yaml"
     images:
       - registry1.dso.mil/ironbank/opensource/keycloak/keycloak-fips:26.6.2-fips
@@ -57,6 +71,7 @@ components:
     charts:
       - name: keycloak
         valuesFiles:
+          - "values/common-values.yaml"
           - "values/unicorn-values.yaml"
     images:
       - cgr.dev/defenseunicorns.com/keycloak-fips:v26.6.2

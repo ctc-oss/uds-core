@@ -16,6 +16,7 @@ spec:
   expose:
     adminDomain: ""
     domain: uds.dev
+    ssoBaseUrl: https://uds.dev/cge/sso
   networking:
     kubeApiCIDR: ""
     kubeNodeCIDRs: []

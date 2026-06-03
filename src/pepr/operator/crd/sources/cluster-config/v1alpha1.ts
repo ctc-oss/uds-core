@@ -119,6 +119,16 @@ export const v1alpha1: V1CustomResourceDefinitionVersion = {
                   description:
                     "Domain all cluster services on the admin gateway will be exposed on",
                 },
+                ssoBaseUrl: {
+                  type: "string",
+                  description:
+                    "Optional explicit base URL for the SSO provider. Defaults to https://sso.<domain>",
+                },
+                caCert: {
+                  type: "string",
+                  description:
+                    "The trusted CA that signed your domain certificates if using Private PKI",
+                },
               },
               required: ["domain"],
             },
