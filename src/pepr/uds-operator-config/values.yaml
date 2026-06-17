@@ -24,7 +24,7 @@ cluster:
     subdomain: "###ZARF_VAR_SUBDOMAIN###"
     contextPath: "###ZARF_VAR_CONTEXT_PATH###"
     adminContextPath: "###ZARF_VAR_ADMIN_CONTEXT_PATH###"
-    pathRouting: false
+    pathRouting: "###ZARF_VAR_PATH_ROUTING###"
   policy:
     allowAllNsExemptions: "###ZARF_VAR_ALLOW_ALL_NS_EXEMPTIONS###"
   networking:

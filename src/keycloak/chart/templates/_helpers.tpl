@@ -108,6 +108,15 @@ Create the service DNS name.
 {{- end -}}
 {{- end -}}
 
+{{- define "keycloak.adminHost" -}}
+{{- $subdomain := .Values.subdomain | default "" -}}
+{{- if or (eq $subdomain "") (hasPrefix "###ZARF_VAR_" $subdomain) -}}
+{{- include "keycloak.adminDomain" . -}}
+{{- else -}}
+{{- printf "%s.%s" $subdomain (include "keycloak.adminDomain" .) -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "keycloak.adminDomain" -}}
 {{- if .Values.adminDomain -}}
 {{- tpl .Values.adminDomain . -}}
@@ -124,6 +133,14 @@ Create the service DNS name.
 {{- printf "%s%s/keycloak" (include "keycloak.contextPath" .) (include "keycloak.adminContextPath" .) -}}
 {{- end -}}
 
+{{- define "keycloak.ssoPathForwardRegex" -}}
+{{- printf "^%s/(.+)$" (include "keycloak.ssoPath" . | regexQuoteMeta) -}}
+{{- end -}}
+
+{{- define "keycloak.adminPathForwardRegex" -}}
+{{- printf "^%s/(.+)$" (include "keycloak.adminPath" . | regexQuoteMeta) -}}
+{{- end -}}
+
 {{- define "keycloak.ssoUrl" -}}
 {{- if eq (include "keycloak.pathRouting.enabled" .) "true" -}}
 {{- printf "https://%s%s" (include "keycloak.host" .) (include "keycloak.ssoPath" .) -}}
@@ -134,7 +151,7 @@ Create the service DNS name.
 
 {{- define "keycloak.adminUrl" -}}
 {{- if eq (include "keycloak.pathRouting.enabled" .) "true" -}}
-{{- printf "https://%s%s" (include "keycloak.host" .) (include "keycloak.adminPath" .) -}}
+{{- printf "https://%s%s" (include "keycloak.adminHost" .) (include "keycloak.adminPath" .) -}}
 {{- else -}}
 {{- printf "https://keycloak.%s" (include "keycloak.adminDomain" .) -}}
 {{- end -}}

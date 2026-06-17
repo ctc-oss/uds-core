@@ -8,7 +8,7 @@ templates:
   - uds-package.yaml
 
 tests:
-  - it: should include uptime blocks when uptime.enabled is true
+  - it: should include public and admin uptime blocks when uptime.enabled is true
     set:
       uptime:
         enabled: true
@@ -18,16 +18,30 @@ tests:
           path: spec.network.expose
           any: true
           content:
+            host: sso
             uptime:
               checks:
                 paths:
                   - /
                   - /realms/uds/.well-known/openid-configuration
 
+      - notContains:
+          path: spec.network.expose
+          any: true
+          content:
+            host: keycloak
+            gateway: admin
+            uptime:
+              checks:
+                paths:
+                  - /realms/uds/.well-known/openid-configuration
+
       - contains:
           path: spec.network.expose
           any: true
           content:
+            host: keycloak
+            gateway: admin
             uptime:
               checks:
                 paths:
@@ -58,7 +72,7 @@ tests:
                 paths:
                   - /
 
-  - it: should include uptime blocks when uptime object is overridden without enabled key (defaults preserved)
+  - it: should include public and admin uptime blocks when uptime object is overridden without enabled key
     set:
       uptime: {}
     template: uds-package.yaml
@@ -67,16 +81,62 @@ tests:
           path: spec.network.expose
           any: true
           content:
+            host: sso
             uptime:
               checks:
                 paths:
                   - /
                   - /realms/uds/.well-known/openid-configuration
 
+      - notContains:
+          path: spec.network.expose
+          any: true
+          content:
+            host: keycloak
+            gateway: admin
+            uptime:
+              checks:
+                paths:
+                  - /realms/uds/.well-known/openid-configuration
+
       - contains:
           path: spec.network.expose
           any: true
           content:
+            host: keycloak
+            gateway: admin
+            uptime:
+              checks:
+                paths:
+                  - /
+
+  - it: should include only path-aware public uptime block when path routing is enabled
+    set:
+      pathRouting: true
+      subdomain: cge
+      contextPath: /cge
+      adminContextPath: /admin
+      uptime:
+        enabled: true
+    template: uds-package.yaml
+    asserts:
+      - contains:
+          path: spec.network.expose
+          any: true
+          content:
+            host: sso
+            uptime:
+              checks:
+                paths:
+                  - /cge/sso
+                  - /cge/sso/realms/uds/.well-known/openid-configuration
+
+      - notContains:
+          path: spec.network.expose
+          any: true
+          content:
+            host: keycloak
+            gateway: admin
             uptime:
               checks:
                 paths:

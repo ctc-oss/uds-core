@@ -77,7 +77,7 @@
             },
             "pathRouting": {
               "type": ["boolean", "string"],
-              "enum": ["true", "false", true, false],
+              "enum": ["true", "false", "###ZARF_VAR_PATH_ROUTING###", true, false],
               "description": "Route built-in services on one host using URL paths."
             }
           }
