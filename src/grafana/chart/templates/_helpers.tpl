@@ -132,6 +132,15 @@ Create the name of the service account to use
 {{- end -}}
 {{- end -}}
 
+{{- define "grafana.adminHost" -}}
+{{- $subdomain := .Values.subdomain | default "" -}}
+{{- if or (eq $subdomain "") (hasPrefix "###ZARF_VAR_" $subdomain) -}}
+{{- include "grafana.adminDomain" . -}}
+{{- else -}}
+{{- printf "%s.%s" $subdomain (include "grafana.adminDomain" .) -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "grafana.adminDomain" -}}
 {{- if .Values.adminDomain -}}
 {{- tpl .Values.adminDomain . -}}
@@ -142,7 +151,7 @@ Create the name of the service account to use
 
 {{- define "grafana.externalUrl" -}}
 {{- if eq (include "grafana.pathRouting.enabled" .) "true" -}}
-{{- printf "https://%s%s%s/grafana" (include "grafana.host" .) (include "grafana.contextPath" .) (include "grafana.adminContextPath" .) -}}
+{{- printf "https://%s%s%s/grafana" (include "grafana.adminHost" .) (include "grafana.contextPath" .) (include "grafana.adminContextPath" .) -}}
 {{- else -}}
 {{- printf "https://grafana.%s" (include "grafana.adminDomain" .) -}}
 {{- end -}}
