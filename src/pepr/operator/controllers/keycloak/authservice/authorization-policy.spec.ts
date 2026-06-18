@@ -325,9 +325,7 @@ describe("authorization-policy.ts", () => {
 
     const authz = jwtAuthZAuthorizationPolicy(labelSelector, name, namespace);
     const source = authz.spec!.rules![0].from![0].source as { notRequestPrincipals?: string[] };
-    expect(source.notRequestPrincipals).toEqual([
-      "https://foo.example.com/bar/sso/realms/uds/*",
-    ]);
+    expect(source.notRequestPrincipals).toEqual(["https://foo.example.com/bar/sso/realms/uds/*"]);
 
     UDSConfig.pathRouting = false;
     UDSConfig.subdomain = "";
