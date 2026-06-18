@@ -74,6 +74,8 @@ function validateExposePaths(cfg: ClusterConfig) {
   const contextPath = normalizeContextPath(expose.contextPath);
   const adminContextPath = normalizeContextPath(expose.adminContextPath, "/admin");
   if (contextPath && contextPath === adminContextPath) {
-    throw new Error("ClusterConfig: expose.contextPath and expose.adminContextPath must not collide");
+    throw new Error(
+      "ClusterConfig: expose.contextPath and expose.adminContextPath must not collide",
+    );
   }
 }

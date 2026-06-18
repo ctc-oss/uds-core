@@ -11,7 +11,6 @@ import {
   getHost as getHostForConfig,
   getPublicBaseUrl as getPublicBaseUrlForConfig,
   getSsoUrl as getSsoUrlForConfig,
-  normalizeContextPath,
 } from "./url-utils";
 
 export { defaultAdminContextPath, normalizeContextPath } from "./url-utils";
