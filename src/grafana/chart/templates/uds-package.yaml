@@ -38,7 +38,7 @@ spec:
       - service: grafana
         selector:
           app.kubernetes.io/name: grafana
-        host: grafana
+        host: {{ .Values.subdomain | default "grafana" }}
         gateway: admin
         port: 80
         targetPort: 3000
@@ -48,8 +48,6 @@ spec:
             - name: grafana-admin-path
               uri:
                 prefix: {{ printf "%s%s/grafana" (include "grafana.contextPath" .) (include "grafana.adminContextPath" .) | quote }}
-          rewrite:
-            uri: /
         {{- end }}
         {{- if .Values.uptime.enabled }}
         uptime:

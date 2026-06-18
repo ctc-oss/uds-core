@@ -1,4 +1,4 @@
-# Copyright 2025 Defense Unicorns
+# Copyright 2025-2026 Defense Unicorns
 # SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-Defense-Unicorns-Commercial
 
 # yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
@@ -38,11 +38,10 @@ tests:
       - equal:
           path: spec.sso[0].redirectUris
           value:
-            - https://foo.example.com/bar/admin/grafana/login/generic_oauth
-            - https://foo.example.com/bar/admin/grafana/login
+            - https://foo.admin.example.com/bar/admin/grafana/login/generic_oauth
+            - https://foo.admin.example.com/bar/admin/grafana/login
       - equal:
           path: spec.network.expose[0].advancedHTTP.match[0].uri.prefix
           value: /bar/admin/grafana
-      - equal:
-          path: spec.network.expose[0].advancedHTTP.rewrite.uri
-          value: /
+      - notExists:
+          path: spec.network.expose[0].advancedHTTP.rewrite
