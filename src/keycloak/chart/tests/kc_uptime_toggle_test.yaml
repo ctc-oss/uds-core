@@ -18,7 +18,6 @@ tests:
           path: spec.network.expose
           any: true
           content:
-            host: sso
             uptime:
               checks:
                 paths:
@@ -29,7 +28,6 @@ tests:
           path: spec.network.expose
           any: true
           content:
-            host: keycloak
             gateway: admin
             uptime:
               checks:
@@ -40,7 +38,6 @@ tests:
           path: spec.network.expose
           any: true
           content:
-            host: keycloak
             gateway: admin
             uptime:
               checks:
@@ -81,7 +78,6 @@ tests:
           path: spec.network.expose
           any: true
           content:
-            host: sso
             uptime:
               checks:
                 paths:
@@ -92,7 +88,6 @@ tests:
           path: spec.network.expose
           any: true
           content:
-            host: keycloak
             gateway: admin
             uptime:
               checks:
@@ -103,7 +98,6 @@ tests:
           path: spec.network.expose
           any: true
           content:
-            host: keycloak
             gateway: admin
             uptime:
               checks:
@@ -124,7 +118,7 @@ tests:
           path: spec.network.expose
           any: true
           content:
-            host: sso
+            host: cge
             uptime:
               checks:
                 paths:
@@ -135,7 +129,7 @@ tests:
           path: spec.network.expose
           any: true
           content:
-            host: keycloak
+            host: cge
             gateway: admin
             uptime:
               checks:
@@ -152,7 +146,6 @@ tests:
           path: spec.network.expose
           any: true
           content:
-            host: sso
             service: keycloak-http
             port: 8080
 
@@ -160,7 +153,6 @@ tests:
           path: spec.network.expose
           any: true
           content:
-            host: keycloak
             gateway: admin
             service: keycloak-http
             port: 8080
