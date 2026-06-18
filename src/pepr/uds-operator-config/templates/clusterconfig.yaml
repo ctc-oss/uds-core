@@ -36,11 +36,7 @@ spec:
   {{- end }}
   expose:
     domain: {{ .Values.cluster.expose.domain | quote }}
-    {{- if .Values.cluster.expose.adminDomain }}
-    adminDomain: {{ .Values.cluster.expose.adminDomain | quote }}
-    {{- else }}
-    adminDomain: "admin.{{ .Values.cluster.expose.domain }}"
-    {{- end }}
+    adminDomain: {{ include "uds-operator-config.adminDomain" . | quote }}
     {{- if .Values.cluster.expose.subdomain }}
     subdomain: {{ .Values.cluster.expose.subdomain | quote }}
     {{- end }}
