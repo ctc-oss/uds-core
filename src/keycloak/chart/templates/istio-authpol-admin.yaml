@@ -21,6 +21,11 @@ spec:
             paths:
               - "/admin*"
               - "/realms/master*"
+            {{- if eq (include "keycloak.pathRouting.enabled" .) "true" }}
+            notPaths:
+              - "/realms/master/protocol/openid-connect/*"
+              - "/realms/master/login-actions/*"
+            {{- end }}
       from:
         - source:
             notNamespaces:
