@@ -55,14 +55,20 @@ tests:
           path: spec.network.expose[2].advancedHTTP.match[1].uri.exact
           value: /bar/admin/keycloak/
       - equal:
+          path: spec.network.expose[2].advancedHTTP.match[2].uri.exact
+          value: /bar/admin/keycloak/admin
+      - equal:
+          path: spec.network.expose[2].advancedHTTP.match[3].uri.exact
+          value: /bar/admin/keycloak/admin/
+      - equal:
           path: spec.network.expose[2].advancedHTTP.redirect.uri
           value: /bar/admin/keycloak/admin/master/console/
       - equal:
           path: spec.network.expose[3].advancedHTTP.match[0].uri.regex
-          value: ^/bar/admin/keycloak/(.+)$
+          value: ^/bar/admin/keycloak/([^/]+/.+)$
       - equal:
           path: spec.network.expose[3].advancedHTTP.rewrite.uriRegexRewrite.match
-          value: ^/bar/admin/keycloak/(.+)$
+          value: ^/bar/admin/keycloak/([^/]+/.+)$
       - equal:
           path: spec.network.expose[3].advancedHTTP.rewrite.uriRegexRewrite.rewrite
           value: /\1

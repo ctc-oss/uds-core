@@ -138,7 +138,7 @@ Create the service DNS name.
 {{- end -}}
 
 {{- define "keycloak.adminPathForwardRegex" -}}
-{{- printf "^%s/(.+)$" (include "keycloak.adminPath" . | regexQuoteMeta) -}}
+{{- printf "^%s/([^/]+/.+)$" (include "keycloak.adminPath" . | regexQuoteMeta) -}}
 {{- end -}}
 
 {{- define "keycloak.ssoUrl" -}}
