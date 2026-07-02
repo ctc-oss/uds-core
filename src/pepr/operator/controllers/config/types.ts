@@ -20,7 +20,6 @@ export enum KeycloakClientMode {
 export type Config = {
   domain: string;
   adminDomain: string;
-  subdomain: string;
   contextPath: string;
   adminContextPath: string;
   pathRouting: boolean;

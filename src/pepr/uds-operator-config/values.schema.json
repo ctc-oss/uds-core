@@ -63,10 +63,6 @@
               "type": "string",
               "description": "Admin domain for cluster exposure."
             },
-            "subdomain": {
-              "type": "string",
-              "description": "Optional subdomain for path-based single-host routing."
-            },
             "contextPath": {
               "type": "string",
               "description": "Optional public context path for path-based single-host routing."

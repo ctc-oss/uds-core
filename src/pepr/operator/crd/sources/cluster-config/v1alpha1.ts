@@ -119,11 +119,6 @@ export const v1alpha1: V1CustomResourceDefinitionVersion = {
                   description:
                     "Domain all cluster services on the admin gateway will be exposed on",
                 },
-                subdomain: {
-                  type: "string",
-                  description:
-                    "Optional subdomain used with domain for single-host path routing, for example foo in foo.uds.dev",
-                },
                 contextPath: {
                   type: "string",
                   description:

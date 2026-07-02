@@ -99,30 +99,20 @@ Create the service DNS name.
 {{- end -}}
 {{- end -}}
 
-{{- define "keycloak.host" -}}
-{{- $subdomain := .Values.subdomain | default "" -}}
-{{- if or (eq $subdomain "") (hasPrefix "###ZARF_VAR_" $subdomain) -}}
-{{- .Values.domain -}}
-{{- else -}}
-{{- printf "%s.%s" $subdomain .Values.domain -}}
-{{- end -}}
-{{- end -}}
-
-{{- define "keycloak.adminHost" -}}
-{{- $subdomain := .Values.subdomain | default "" -}}
-{{- if or (eq $subdomain "") (hasPrefix "###ZARF_VAR_" $subdomain) -}}
-{{- include "keycloak.adminDomain" . -}}
-{{- else -}}
-{{- printf "%s.%s" $subdomain (include "keycloak.adminDomain" .) -}}
-{{- end -}}
-{{- end -}}
-
 {{- define "keycloak.adminDomain" -}}
 {{- if .Values.adminDomain -}}
 {{- tpl .Values.adminDomain . -}}
 {{- else -}}
 {{- printf "admin.%s" .Values.domain -}}
 {{- end -}}
+{{- end -}}
+
+{{- define "keycloak.host" -}}
+{{- .Values.domain -}}
+{{- end -}}
+
+{{- define "keycloak.adminHost" -}}
+{{- include "keycloak.adminDomain" . -}}
 {{- end -}}
 
 {{- define "keycloak.ssoPath" -}}

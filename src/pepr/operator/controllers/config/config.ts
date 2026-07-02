@@ -17,8 +17,8 @@ import { reconcileAuthservice } from "../keycloak/authservice/authservice";
 import { Action, AuthServiceEvent } from "../keycloak/authservice/types";
 import { initAPIServerCIDR } from "../network/generators/kubeAPI";
 import { initAllNodesTarget } from "../network/generators/kubeNodes";
-import { registerWatchEventHandlers, watchCfg } from "../utils";
 import { normalizeContextPath } from "../url-utils";
+import { registerWatchEventHandlers, watchCfg } from "../utils";
 import { Config, KeycloakClientMode } from "./types";
 
 export const configLog = setupLogger(Component.OPERATOR_CONFIG);
@@ -27,7 +27,6 @@ export const configLog = setupLogger(Component.OPERATOR_CONFIG);
 export const UDSConfig: Config = {
   domain: "",
   adminDomain: "",
-  subdomain: "",
   contextPath: "",
   adminContextPath: "/admin",
   pathRouting: false,
@@ -370,8 +369,6 @@ export async function handleCfg(cfg: ClusterConfig, action: ConfigAction) {
       expose.adminDomain && expose.adminDomain !== "###ZARF_VAR_ADMIN_DOMAIN###"
         ? expose.adminDomain
         : `admin.${domain}`;
-    const subdomain =
-      expose.subdomain && expose.subdomain !== "###ZARF_VAR_SUBDOMAIN###" ? expose.subdomain : "";
     const contextPath = normalizeContextPath(expose.contextPath);
     const adminContextPath = normalizeContextPath(expose.adminContextPath, "/admin");
     const pathRouting = expose.pathRouting === true;
@@ -379,14 +376,12 @@ export async function handleCfg(cfg: ClusterConfig, action: ConfigAction) {
     if (
       domain !== UDSConfig.domain ||
       adminDomain !== UDSConfig.adminDomain ||
-      subdomain !== UDSConfig.subdomain ||
       contextPath !== UDSConfig.contextPath ||
       adminContextPath !== UDSConfig.adminContextPath ||
       pathRouting !== UDSConfig.pathRouting
     ) {
       UDSConfig.domain = domain;
       UDSConfig.adminDomain = adminDomain;
-      UDSConfig.subdomain = subdomain;
       UDSConfig.contextPath = contextPath;
       UDSConfig.adminContextPath = adminContextPath;
       UDSConfig.pathRouting = pathRouting;

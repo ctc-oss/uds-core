@@ -122,7 +122,6 @@ vi.mock("../../config/config", () => ({
   UDSConfig: {
     domain: "uds.dev",
     adminDomain: "admin.uds.dev",
-    subdomain: "",
     contextPath: "",
     adminContextPath: "/admin",
     pathRouting: false,
@@ -135,7 +134,6 @@ vi.mock("./authorization-policy", () => ({
   UDSConfig: {
     domain: "uds.dev",
     adminDomain: "admin.uds.dev",
-    subdomain: "",
     contextPath: "",
     adminContextPath: "/admin",
     pathRouting: false,
@@ -339,13 +337,11 @@ describe("authservice", () => {
     vi.clearAllMocks();
     UDSConfig.domain = "uds.dev";
     UDSConfig.adminDomain = "admin.uds.dev";
-    UDSConfig.subdomain = "";
     UDSConfig.contextPath = "";
     UDSConfig.adminContextPath = "/admin";
     UDSConfig.pathRouting = false;
     authorizationPolicy.UDSConfig.domain = "uds.dev";
     authorizationPolicy.UDSConfig.adminDomain = "admin.uds.dev";
-    authorizationPolicy.UDSConfig.subdomain = "";
     authorizationPolicy.UDSConfig.contextPath = "";
     authorizationPolicy.UDSConfig.adminContextPath = "/admin";
     authorizationPolicy.UDSConfig.pathRouting = false;
@@ -519,10 +515,8 @@ describe("authservice", () => {
 
   test("should build authservice chain with path-routed SSO URLs", async () => {
     UDSConfig.pathRouting = true;
-    UDSConfig.subdomain = "foo";
     UDSConfig.contextPath = "/bar";
     authorizationPolicy.UDSConfig.pathRouting = true;
-    authorizationPolicy.UDSConfig.subdomain = "foo";
     authorizationPolicy.UDSConfig.contextPath = "/bar";
 
     const chain = buildChain({

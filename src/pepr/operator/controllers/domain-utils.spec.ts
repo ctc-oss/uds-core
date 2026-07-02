@@ -18,7 +18,6 @@ import {
 
 UDSConfig.domain = "uds.dev";
 UDSConfig.adminDomain = "admin.uds.dev";
-UDSConfig.subdomain = "";
 UDSConfig.contextPath = "";
 UDSConfig.adminContextPath = "/admin";
 UDSConfig.pathRouting = false;
@@ -51,20 +50,16 @@ describe("getFqdn", () => {
 
   it("should return the shared host for built-in services when path routing is enabled", () => {
     UDSConfig.pathRouting = true;
-    UDSConfig.subdomain = "foo";
     const expose: Expose = { host: "grafana", gateway: "admin" };
     expect(getFqdn(expose)).toEqual("foo.uds.dev");
     UDSConfig.pathRouting = false;
-    UDSConfig.subdomain = "";
   });
 
   it("should preserve package FQDNs when path routing is enabled", () => {
     UDSConfig.pathRouting = true;
-    UDSConfig.subdomain = "foo";
     const expose: Expose = { host: "app", gateway: "tenant" };
     expect(getFqdn(expose)).toEqual("app.uds.dev");
     UDSConfig.pathRouting = false;
-    UDSConfig.subdomain = "";
   });
 });
 
@@ -81,7 +76,6 @@ describe("path routing URL helpers", () => {
 
   it("computes single-host public and admin URLs", () => {
     UDSConfig.pathRouting = true;
-    UDSConfig.subdomain = "foo";
     UDSConfig.contextPath = "/bar";
     UDSConfig.adminContextPath = "/admin";
 
@@ -92,7 +86,6 @@ describe("path routing URL helpers", () => {
     expect(getAdminAppUrl("grafana")).toEqual("https://foo.uds.dev/bar/admin/grafana");
 
     UDSConfig.pathRouting = false;
-    UDSConfig.subdomain = "";
     UDSConfig.contextPath = "";
     UDSConfig.adminContextPath = "/admin";
   });

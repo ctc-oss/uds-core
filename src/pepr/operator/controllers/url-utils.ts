@@ -18,7 +18,7 @@ export function normalizeContextPath(path?: string, defaultPath = ""): string {
 }
 
 export function getHost(config: Config): string {
-  return config.subdomain ? `${config.subdomain}.${config.domain}` : config.domain;
+  return config.domain;
 }
 
 export function getPublicBaseUrl(config: Config): string {

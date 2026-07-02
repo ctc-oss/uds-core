@@ -64,7 +64,6 @@ describe("updateBlackboxConfig", () => {
   beforeEach(() => {
     UDSConfig.domain = "uds.dev";
     UDSConfig.adminDomain = "admin.uds.dev";
-    UDSConfig.subdomain = "";
     UDSConfig.contextPath = "";
     UDSConfig.adminContextPath = "/admin";
     UDSConfig.pathRouting = false;
@@ -103,7 +102,6 @@ describe("updateBlackboxConfig", () => {
 
   it("generates OAuth2 config with the path-routed SSO token URL", async () => {
     UDSConfig.pathRouting = true;
-    UDSConfig.subdomain = "foo";
     UDSConfig.contextPath = "/bar";
     secretClient.Get.mockResolvedValue(makeBlackboxSecret({ modules: {} }));
 

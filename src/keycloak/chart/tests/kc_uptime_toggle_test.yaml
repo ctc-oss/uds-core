@@ -107,7 +107,6 @@ tests:
   - it: should include only path-aware public uptime block when path routing is enabled
     set:
       pathRouting: true
-      subdomain: abc
       contextPath: /xyz
       adminContextPath: /admin
       uptime:

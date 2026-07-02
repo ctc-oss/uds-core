@@ -23,7 +23,6 @@ import {
 beforeAll(() => {
   UDSConfig.domain = "example.com";
   UDSConfig.adminDomain = "admin.example.com";
-  UDSConfig.subdomain = "";
   UDSConfig.contextPath = "";
   UDSConfig.adminContextPath = "/admin";
   UDSConfig.pathRouting = false;
@@ -314,7 +313,6 @@ describe("authorization-policy.ts", () => {
 
   it("uses path-routed issuer and JWKS URLs", () => {
     UDSConfig.pathRouting = true;
-    UDSConfig.subdomain = "foo";
     UDSConfig.contextPath = "/bar";
 
     const authn = authNRequestAuthentication(labelSelector, name, namespace, true, waypointName);
@@ -328,7 +326,6 @@ describe("authorization-policy.ts", () => {
     expect(source.notRequestPrincipals).toEqual(["https://foo.example.com/bar/sso/realms/uds/*"]);
 
     UDSConfig.pathRouting = false;
-    UDSConfig.subdomain = "";
     UDSConfig.contextPath = "";
   });
 

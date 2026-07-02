@@ -123,30 +123,20 @@ Create the name of the service account to use
 {{- end -}}
 {{- end -}}
 
-{{- define "grafana.host" -}}
-{{- $subdomain := .Values.subdomain | default "" -}}
-{{- if or (eq $subdomain "") (hasPrefix "###ZARF_VAR_" $subdomain) -}}
-{{- .Values.domain -}}
-{{- else -}}
-{{- printf "%s.%s" $subdomain .Values.domain -}}
-{{- end -}}
-{{- end -}}
-
-{{- define "grafana.adminHost" -}}
-{{- $subdomain := .Values.subdomain | default "" -}}
-{{- if or (eq $subdomain "") (hasPrefix "###ZARF_VAR_" $subdomain) -}}
-{{- include "grafana.adminDomain" . -}}
-{{- else -}}
-{{- printf "%s.%s" $subdomain (include "grafana.adminDomain" .) -}}
-{{- end -}}
-{{- end -}}
-
 {{- define "grafana.adminDomain" -}}
 {{- if .Values.adminDomain -}}
 {{- tpl .Values.adminDomain . -}}
 {{- else -}}
 {{- printf "admin.%s" .Values.domain -}}
 {{- end -}}
+{{- end -}}
+
+{{- define "grafana.host" -}}
+{{- .Values.domain -}}
+{{- end -}}
+
+{{- define "grafana.adminHost" -}}
+{{- include "grafana.adminDomain" . -}}
 {{- end -}}
 
 {{- define "grafana.externalUrl" -}}

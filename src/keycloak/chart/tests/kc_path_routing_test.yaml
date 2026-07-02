@@ -8,7 +8,6 @@ set:
   domain: example.com
   adminDomain: admin.example.com
   pathRouting: true
-  subdomain: foo
   contextPath: /bar
   adminContextPath: /admin
 templates:
@@ -78,30 +77,30 @@ tests:
     asserts:
       - contains:
           path: spec.template.spec.containers[0].args
-          content: --hostname=https://foo.example.com/bar/sso
+          content: --hostname=https://example.com/bar/sso
       - contains:
           path: spec.template.spec.containers[0].args
-          content: --hostname-admin=https://foo.admin.example.com/bar/admin/keycloak
+          content: --hostname-admin=https://admin.example.com/bar/admin/keycloak
       - contains:
           path: spec.template.spec.containers[0].env
           content:
             name: UDS_URL
-            value: https://foo.example.com/bar/sso
+            value: https://example.com/bar/sso
       - contains:
           path: spec.template.spec.containers[0].env
           content:
             name: UDS_ADMIN_URL
-            value: https://foo.admin.example.com/bar/admin/keycloak
+            value: https://admin.example.com/bar/admin/keycloak
 
   - it: should protect the shared host from path parameter bypasses
     template: path-parameter-envoyfilter.yaml
     asserts:
       - matchRegex:
           path: spec.configPatches[0].patch.value.typed_config.inlineCode
-          pattern: host == "foo.example.com"
+          pattern: host == "example.com"
       - matchRegex:
           path: spec.configPatches[0].patch.value.typed_config.inlineCode
-          pattern: host == "foo.admin.example.com"
+          pattern: host == "admin.example.com"
 
   - it: should allow master realm browser auth endpoints for admin console
     template: istio-authpol-admin.yaml

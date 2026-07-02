@@ -104,7 +104,6 @@ tests:
       cluster:
         expose:
           domain: "example.com"
-          subdomain: "foo"
           contextPath: "/bar"
           adminContextPath: "/admin"
           pathRouting: true
@@ -116,7 +115,6 @@ tests:
           value:
             domain: "example.com"
             adminDomain: "admin.example.com"
-            subdomain: "foo"
             contextPath: "/bar"
             adminContextPath: "/admin"
             pathRouting: true

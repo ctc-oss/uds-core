@@ -5,6 +5,7 @@
 
 import { K8s, kind } from "pepr";
 import { afterEach, beforeEach, describe, expect, it, Mock, vi } from "vitest";
+import { UDSConfig } from "../../config/config";
 import {
   buildInitialSecret,
   getAuthserviceConfig,
@@ -13,7 +14,6 @@ import {
   updateAuthServiceSecret,
 } from "./config";
 import { AuthserviceConfig } from "./types";
-import { UDSConfig } from "../../config/config";
 
 const getChain = (name: string) => {
   return {
@@ -123,7 +123,6 @@ describe("AuthService Config Tests", () => {
     process.env.PEPR_WATCH_MODE = "true";
     UDSConfig.domain = "uds.dev";
     UDSConfig.adminDomain = "admin.uds.dev";
-    UDSConfig.subdomain = "";
     UDSConfig.contextPath = "";
     UDSConfig.adminContextPath = "/admin";
     UDSConfig.pathRouting = false;
@@ -158,7 +157,6 @@ describe("AuthService Config Tests", () => {
 
   it("buildInitialSecret should use path-routed SSO URLs", () => {
     UDSConfig.pathRouting = true;
-    UDSConfig.subdomain = "foo";
     UDSConfig.contextPath = "/bar";
     initializeOperatorConfig();
 

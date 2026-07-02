@@ -146,7 +146,6 @@ invalid-cert-data
         expose: {
           ...mockCfg.spec!.expose,
           pathRouting: true,
-          subdomain: "foo",
           contextPath: "/bar",
           adminContextPath: "/admin",
         },
