@@ -83,7 +83,6 @@ Create the name of the service account to use
 {{- fail "Missing remoteSelector or remoteNamespace for internal PostgreSQL." -}}
 {{- end }}
 {{- end }}
-
 {{- if (empty (compact (values (omit .Values.postgresql "port" "internal" "ssl_mode")))) -}}
 {{- if .Values.postgresql.internal.enabled -}}
 {{- fail "Missing configuration for internal postgres host, database, user, and password." -}}

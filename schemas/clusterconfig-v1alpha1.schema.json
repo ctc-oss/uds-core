@@ -16,7 +16,9 @@
           "$ref": "#/definitions/Status"
         }
       },
-      "required": ["spec"],
+      "required": [
+        "spec"
+      ],
       "title": "ClusterConfig"
     },
     "Metadata": {
@@ -50,7 +52,10 @@
           "$ref": "#/definitions/Policy"
         }
       },
-      "required": ["expose", "policy"],
+      "required": [
+        "expose",
+        "policy"
+      ],
       "title": "Spec"
     },
     "Attributes": {
@@ -117,7 +122,9 @@
           "description": "Route built-in public and admin services on a single host using URL paths"
         }
       },
-      "required": ["domain"],
+      "required": [
+        "domain"
+      ],
       "title": "Expose"
     },
     "Networking": {
@@ -148,7 +155,9 @@
           "description": "Allow UDS Exemption custom resources to live in any namespace (default false)"
         }
       },
-      "required": ["allowAllNsExemptions"],
+      "required": [
+        "allowAllNsExemptions"
+      ],
       "title": "Policy"
     },
     "Status": {
@@ -167,12 +176,18 @@
     },
     "Name": {
       "type": "string",
-      "enum": ["uds-cluster-config"],
+      "enum": [
+        "uds-cluster-config"
+      ],
       "title": "Name"
     },
     "Phase": {
       "type": "string",
-      "enum": ["Pending", "Ready", "Failed"],
+      "enum": [
+        "Pending",
+        "Ready",
+        "Failed"
+      ],
       "title": "Phase"
     }
   }
