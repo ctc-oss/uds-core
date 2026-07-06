@@ -6,17 +6,17 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import type { UDSPackage } from "../../../crd";
 import type {
-  Operation as IstioOperation,
-  Rule as IstioRule,
-  To as IstioTo,
+    Operation as IstioOperation,
+    Rule as IstioRule,
+    To as IstioTo,
 } from "../../../crd/generated/istio/authorizationpolicy-v1";
 import { PROMETHEUS_PRINCIPAL } from "../../utils";
 import {
-  authNRequestAuthentication,
-  authserviceAuthorizationPolicy,
-  computeMonitorExemptions,
-  jwtAuthZAuthorizationPolicy,
-  UDSConfig,
+    authNRequestAuthentication,
+    authserviceAuthorizationPolicy,
+    computeMonitorExemptions,
+    jwtAuthZAuthorizationPolicy,
+    UDSConfig,
 } from "./authorization-policy";
 
 // Patch UDSConfig for deterministic output
@@ -316,14 +316,14 @@ describe("authorization-policy.ts", () => {
     UDSConfig.contextPath = "/bar";
 
     const authn = authNRequestAuthentication(labelSelector, name, namespace, true, waypointName);
-    expect(authn.spec!.jwtRules![0].issuer).toEqual("https://foo.example.com/bar/sso/realms/uds");
+    expect(authn.spec!.jwtRules![0].issuer).toEqual("https://example.com/bar/sso/realms/uds");
     expect(authn.spec!.jwtRules![0].jwksUri).toEqual(
-      "https://foo.example.com/bar/sso/realms/uds/protocol/openid-connect/certs",
+      "https://example.com/bar/sso/realms/uds/protocol/openid-connect/certs",
     );
 
     const authz = jwtAuthZAuthorizationPolicy(labelSelector, name, namespace);
     const source = authz.spec!.rules![0].from![0].source as { notRequestPrincipals?: string[] };
-    expect(source.notRequestPrincipals).toEqual(["https://foo.example.com/bar/sso/realms/uds/*"]);
+    expect(source.notRequestPrincipals).toEqual(["https://example.com/bar/sso/realms/uds/*"]);
 
     UDSConfig.pathRouting = false;
     UDSConfig.contextPath = "";

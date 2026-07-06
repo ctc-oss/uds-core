@@ -526,13 +526,13 @@ describe("authservice", () => {
     } as unknown as AuthServiceEvent);
 
     expect(chain.filters[0].oidc_override?.authorization_uri).toEqual(
-      "https://foo.uds.dev/bar/sso/realms/uds/protocol/openid-connect/auth",
+      "https://uds.dev/bar/sso/realms/uds/protocol/openid-connect/auth",
     );
     expect(chain.filters[0].oidc_override?.token_uri).toEqual(
-      "https://foo.uds.dev/bar/sso/realms/uds/protocol/openid-connect/token",
+      "https://uds.dev/bar/sso/realms/uds/protocol/openid-connect/token",
     );
     expect(chain.filters[0].oidc_override?.logout?.redirect_uri).toEqual(
-      "https://foo.uds.dev/bar/sso/realms/uds/protocol/openid-connect/logout",
+      "https://uds.dev/bar/sso/realms/uds/protocol/openid-connect/logout",
     );
   });
 

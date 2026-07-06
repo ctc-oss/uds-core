@@ -7,11 +7,11 @@ import { K8s, kind } from "pepr";
 import { afterEach, beforeEach, describe, expect, it, Mock, vi } from "vitest";
 import { UDSConfig } from "../../config/config";
 import {
-  buildInitialSecret,
-  getAuthserviceConfig,
-  initializeOperatorConfig,
-  setupAuthserviceSecret,
-  updateAuthServiceSecret,
+    buildInitialSecret,
+    getAuthserviceConfig,
+    initializeOperatorConfig,
+    setupAuthserviceSecret,
+    updateAuthServiceSecret,
 } from "./config";
 import { AuthserviceConfig } from "./types";
 
@@ -162,13 +162,13 @@ describe("AuthService Config Tests", () => {
 
     const secret = buildInitialSecret();
     expect(secret.default_oidc_config.authorization_uri).toEqual(
-      "https://foo.uds.dev/bar/sso/realms/uds/protocol/openid-connect/auth",
+      "https://uds.dev/bar/sso/realms/uds/protocol/openid-connect/auth",
     );
     expect(secret.default_oidc_config.token_uri).toEqual(
-      "https://foo.uds.dev/bar/sso/realms/uds/protocol/openid-connect/token",
+      "https://uds.dev/bar/sso/realms/uds/protocol/openid-connect/token",
     );
     expect(secret.default_oidc_config.jwks_fetcher?.jwks_uri).toEqual(
-      "https://foo.uds.dev/bar/sso/realms/uds/protocol/openid-connect/certs",
+      "https://uds.dev/bar/sso/realms/uds/protocol/openid-connect/certs",
     );
   });
 

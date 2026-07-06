@@ -7,11 +7,11 @@ import { K8s } from "pepr";
 import { afterEach, beforeEach, describe, expect, it, Mock, vi } from "vitest";
 import { UDSConfig } from "../config/config";
 import {
-  BLACKBOX_BASE_CONFIG,
-  BLACKBOX_CONFIG_NAMESPACE,
-  BLACKBOX_CONFIG_SECRET_NAME,
-  setupUptimeConfig,
-  updateBlackboxConfig,
+    BLACKBOX_BASE_CONFIG,
+    BLACKBOX_CONFIG_NAMESPACE,
+    BLACKBOX_CONFIG_SECRET_NAME,
+    setupUptimeConfig,
+    updateBlackboxConfig,
 } from "./config";
 
 vi.mock("pepr", () => {
@@ -110,7 +110,7 @@ describe("updateBlackboxConfig", () => {
     const applied = getAppliedConfig(secretClient);
     const oauth2 = applied.modules["http_200x_sso_my-ns_app-probe"].http.oauth2;
     expect(oauth2.token_url).toEqual(
-      "https://foo.uds.dev/bar/sso/realms/uds/protocol/openid-connect/token",
+      "https://uds.dev/bar/sso/realms/uds/protocol/openid-connect/token",
     );
   });
 

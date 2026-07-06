@@ -26,7 +26,7 @@ export function getPublicBaseUrl(config: Config): string {
 }
 
 export function getAdminBaseUrl(config: Config): string {
-  return `${getPublicBaseUrl(config)}${config.adminContextPath || defaultAdminContextPath}`;
+  return `https://${config.adminDomain}${config.contextPath}${config.adminContextPath || defaultAdminContextPath}`;
 }
 
 export function getSsoUrl(config: Config): string {

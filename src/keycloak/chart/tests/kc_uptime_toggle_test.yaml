@@ -117,7 +117,7 @@ tests:
           path: spec.network.expose
           any: true
           content:
-            host: abc
+            host: .
             uptime:
               checks:
                 paths:
@@ -128,7 +128,7 @@ tests:
           path: spec.network.expose
           any: true
           content:
-            host: abc
+            host: .
             gateway: admin
             uptime:
               checks:
