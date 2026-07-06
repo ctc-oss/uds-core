@@ -128,7 +128,7 @@ export const v1alpha1: V1CustomResourceDefinitionVersion = {
                   type: "string",
                   description:
                     "Optional admin URL context path appended after contextPath when pathRouting is enabled",
-                  default: "/admin",
+                  default: "",
                 },
                 pathRouting: {
                   type: "boolean",

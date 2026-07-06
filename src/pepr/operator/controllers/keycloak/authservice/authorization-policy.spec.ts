@@ -6,17 +6,17 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import type { UDSPackage } from "../../../crd";
 import type {
-    Operation as IstioOperation,
-    Rule as IstioRule,
-    To as IstioTo,
+  Operation as IstioOperation,
+  Rule as IstioRule,
+  To as IstioTo,
 } from "../../../crd/generated/istio/authorizationpolicy-v1";
 import { PROMETHEUS_PRINCIPAL } from "../../utils";
 import {
-    authNRequestAuthentication,
-    authserviceAuthorizationPolicy,
-    computeMonitorExemptions,
-    jwtAuthZAuthorizationPolicy,
-    UDSConfig,
+  authNRequestAuthentication,
+  authserviceAuthorizationPolicy,
+  computeMonitorExemptions,
+  jwtAuthZAuthorizationPolicy,
+  UDSConfig,
 } from "./authorization-policy";
 
 // Patch UDSConfig for deterministic output

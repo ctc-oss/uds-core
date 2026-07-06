@@ -90,9 +90,9 @@ Create the service DNS name.
 {{- end -}}
 
 {{- define "keycloak.adminContextPath" -}}
-{{- $path := .Values.adminContextPath | default "/admin" -}}
-{{- if hasPrefix "###ZARF_VAR_" $path -}}
-{{- "/admin" -}}
+{{- $path := .Values.adminContextPath | default "" -}}
+{{- if or (eq $path "") (eq $path "/") (hasPrefix "###ZARF_VAR_" $path) -}}
+{{- "" -}}
 {{- else -}}
 {{- $withLeading := ternary $path (printf "/%s" $path) (hasPrefix "/" $path) -}}
 {{- trimSuffix "/" $withLeading -}}

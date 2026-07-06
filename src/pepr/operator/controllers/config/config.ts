@@ -28,7 +28,7 @@ export const UDSConfig: Config = {
   domain: "",
   adminDomain: "",
   contextPath: "",
-  adminContextPath: "/admin",
+  adminContextPath: "",
   pathRouting: false,
   caBundle: {
     certs: "",

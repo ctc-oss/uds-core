@@ -7,11 +7,11 @@ import { K8s, kind } from "pepr";
 import { afterEach, beforeEach, describe, expect, it, Mock, vi } from "vitest";
 import { UDSConfig } from "../../config/config";
 import {
-    buildInitialSecret,
-    getAuthserviceConfig,
-    initializeOperatorConfig,
-    setupAuthserviceSecret,
-    updateAuthServiceSecret,
+  buildInitialSecret,
+  getAuthserviceConfig,
+  initializeOperatorConfig,
+  setupAuthserviceSecret,
+  updateAuthServiceSecret,
 } from "./config";
 import { AuthserviceConfig } from "./types";
 

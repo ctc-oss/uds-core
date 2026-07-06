@@ -114,9 +114,9 @@ Create the name of the service account to use
 {{- end -}}
 
 {{- define "grafana.adminContextPath" -}}
-{{- $path := .Values.adminContextPath | default "/admin" -}}
-{{- if hasPrefix "###ZARF_VAR_" $path -}}
-{{- "/admin" -}}
+{{- $path := .Values.adminContextPath | default "" -}}
+{{- if or (eq $path "") (eq $path "/") (hasPrefix "###ZARF_VAR_" $path) -}}
+{{- "" -}}
 {{- else -}}
 {{- $withLeading := ternary $path (printf "/%s" $path) (hasPrefix "/" $path) -}}
 {{- trimSuffix "/" $withLeading -}}

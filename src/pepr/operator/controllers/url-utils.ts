@@ -5,7 +5,7 @@
 
 import type { Config } from "./config/types";
 
-export const defaultAdminContextPath = "/admin";
+export const defaultAdminContextPath = "";
 
 export function normalizeContextPath(path?: string, defaultPath = ""): string {
   const rawPath = path || defaultPath;

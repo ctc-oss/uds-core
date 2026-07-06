@@ -24,7 +24,7 @@ variables:
 
   - name: ADMIN_CONTEXT_PATH
     description: "Optional admin context path for single-host path routing"
-    default: "/admin"
+    default: ""
 
   - name: PATH_ROUTING
     description: "Whether to route built-in services on one host using URL paths"

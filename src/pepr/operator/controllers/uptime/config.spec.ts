@@ -7,11 +7,11 @@ import { K8s } from "pepr";
 import { afterEach, beforeEach, describe, expect, it, Mock, vi } from "vitest";
 import { UDSConfig } from "../config/config";
 import {
-    BLACKBOX_BASE_CONFIG,
-    BLACKBOX_CONFIG_NAMESPACE,
-    BLACKBOX_CONFIG_SECRET_NAME,
-    setupUptimeConfig,
-    updateBlackboxConfig,
+  BLACKBOX_BASE_CONFIG,
+  BLACKBOX_CONFIG_NAMESPACE,
+  BLACKBOX_CONFIG_SECRET_NAME,
+  setupUptimeConfig,
+  updateBlackboxConfig,
 } from "./config";
 
 vi.mock("pepr", () => {
