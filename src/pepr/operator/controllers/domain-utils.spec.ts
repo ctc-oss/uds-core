@@ -7,7 +7,13 @@ import { describe, expect, it } from "vitest";
 import { Expose } from "../crd";
 import { UDSConfig } from "./config/config";
 import { getFqdn } from "./domain-utils";
-import { getAdminAppUrl, getAdminBaseUrl, getPublicBaseUrl, getSsoUrl, normalizeContextPath } from "./url-utils";
+import {
+  getAdminAppUrl,
+  getAdminBaseUrl,
+  getPublicBaseUrl,
+  getSsoUrl,
+  normalizeContextPath,
+} from "./url-utils";
 
 UDSConfig.domain = "uds.dev";
 UDSConfig.adminDomain = "admin.uds.dev";
