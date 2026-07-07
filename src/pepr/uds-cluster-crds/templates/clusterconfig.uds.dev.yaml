@@ -109,14 +109,14 @@ spec:
                     contextPath:
                       type: string
                       description: >-
-                        Optional public URL context path used when pathRouting is
-                        enabled, for example /bar
+                        Optional public URL context path used when pathRouting
+                        is enabled, for example /bar
                     adminContextPath:
                       type: string
                       description: >-
                         Optional admin URL context path appended after
                         contextPath when pathRouting is enabled
-                      default: /admin
+                      default: ''
                     pathRouting:
                       type: boolean
                       description: >-
