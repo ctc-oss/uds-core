@@ -23,6 +23,37 @@ sidebar:
 </table>
 </div>
 
+**Path-routing example for `match` and `rewrite`**
+
+When you use path-based routing, you can combine `match.uri` with `advancedHTTP.rewrite` so external path prefixes map cleanly to backend application paths.
+
+```yaml title="uds-package.yaml"
+apiVersion: uds.dev/v1alpha1
+kind: Package
+metadata:
+  name: app1
+  namespace: app1
+spec:
+  network:
+    expose:
+      - service: app1
+        selector:
+          app: app1
+        host: app1
+        gateway: tenant
+        port: 8080
+        match:
+          - name: app1-prefix
+            uri:
+              prefix: /app1
+        advancedHTTP:
+          rewrite:
+            # Replace /app1/* with /* before forwarding to the backend service.
+            uri: /
+```
+
+For a complete path-routing workflow, including `ClusterConfig` configuration and built-in route behavior, reference [Use path-based routing](/how-to-guides/networking/use-path-based-routing/).
+
 <a id="Spec"></a>
 <div style="margin-left: 40px; padding-top: 30px;">
 
