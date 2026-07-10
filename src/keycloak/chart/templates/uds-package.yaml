@@ -154,10 +154,16 @@ spec:
                 prefix: {{ ternary (printf "%s/admin" (include "keycloak.ssoPath" .)) "/admin" (eq (include "keycloak.pathRouting.enabled" .) "true") | quote }}
             - name: redirect-master-realm
               uri:
-                exact: {{ ternary (printf "%s/realms/master" (include "keycloak.ssoPath" .)) "/realms/master" (eq (include "keycloak.pathRouting.enabled" .) "true") | quote }}
+                {{- if eq (include "keycloak.pathRouting.enabled" .) "true" }}
+                exact: {{ printf "%s/realms/master" (include "keycloak.ssoPath" .) | quote }}
+                {{- else }}
+                prefix: "/realms/master"
+                {{- end }}
+            {{- if eq (include "keycloak.pathRouting.enabled" .) "true" }}
             - name: redirect-master-realm-slash
               uri:
-                exact: {{ ternary (printf "%s/realms/master/" (include "keycloak.ssoPath" .)) "/realms/master/" (eq (include "keycloak.pathRouting.enabled" .) "true") | quote }}
+                exact: {{ printf "%s/realms/master/" (include "keycloak.ssoPath" .) | quote }}
+            {{- end }}
             - name: redirect-metrics
               uri:
                 prefix: {{ ternary (printf "%s/metrics" (include "keycloak.ssoPath" .)) "/metrics" (eq (include "keycloak.pathRouting.enabled" .) "true") | quote }}

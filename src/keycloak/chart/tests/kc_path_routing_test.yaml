@@ -119,3 +119,20 @@ tests:
     asserts:
       - notExists:
           path: spec.rules[0].to[0].operation.notPaths
+
+  - it: should keep legacy master realm redirect matching when path routing is disabled
+    set:
+      pathRouting: false
+    template: uds-package.yaml
+    asserts:
+      - equal:
+          path: spec.network.expose[0].advancedHTTP.match[2].name
+          value: redirect-master-realm
+      - equal:
+          path: spec.network.expose[0].advancedHTTP.match[2].uri.prefix
+          value: /realms/master
+      - notContains:
+          path: spec.network.expose[0].advancedHTTP.match
+          any: true
+          content:
+            name: redirect-master-realm-slash
