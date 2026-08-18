@@ -6,7 +6,7 @@
 import { R } from "pepr";
 
 import { Component, setupLogger } from "../../../../logger";
-import { K8sGateway, UDSPackage } from "../../../crd";
+import { Expose, K8sGateway, Sso, UDSPackage } from "../../../crd";
 import { AuthserviceClient, Mode } from "../../../crd/generated/package-v1alpha1";
 import { cleanupWaypointLabels, setupAmbientWaypoint } from "../../istio/ambient-waypoint";
 import { getWaypointName } from "../../istio/waypoint-utils";
@@ -30,6 +30,7 @@ import {
 
 export const log = setupLogger(Component.OPERATOR_AUTHSERVICE);
 let lock = false;
+const EXTRA_CHAIN_PREFIX = "__extra__";
 
 function getPathMatchPrefix(pathname: string): string {
   if (!pathname || pathname === "/") {
@@ -64,6 +65,93 @@ function getPathMatchPrefix(pathname: string): string {
   }
 
   return trimmedPath;
+}
+
+function selectorsMatch(
+  selector: Record<string, string> | undefined,
+  podLabels: Record<string, string> | undefined,
+): boolean {
+  const safeSelector = selector ?? {};
+
+  if (Object.keys(safeSelector).length === 0) {
+    return true;
+  }
+
+  if (!podLabels) {
+    return false;
+  }
+
+  return Object.entries(safeSelector).every(([key, value]) => podLabels[key] === value);
+}
+
+function getExposeSelector(expose: Expose): Record<string, string> | undefined {
+  return expose.selector ?? expose.podLabels;
+}
+
+function getExtraChainName(clientId: string, pathPrefix: string): string {
+  const encodedPrefix = Buffer.from(pathPrefix).toString("base64url");
+  return `${clientId}${EXTRA_CHAIN_PREFIX}${encodedPrefix}`;
+}
+
+function isClientOwnedChain(chainName: string, clientId: string): boolean {
+  return chainName === clientId || chainName.startsWith(`${clientId}${EXTRA_CHAIN_PREFIX}`);
+}
+
+export function collectPathPrefixesForSso(pkg: UDSPackage, sso: Sso): string[] {
+  const prefixes = new Set<string>();
+
+  for (const redirectUri of sso.redirectUris ?? []) {
+    const parsed = new URL(redirectUri);
+    prefixes.add(getPathMatchPrefix(parsed.pathname));
+  }
+
+  for (const expose of pkg.spec?.network?.expose ?? []) {
+    if (!selectorsMatch(sso.enableAuthserviceSelector, getExposeSelector(expose))) {
+      continue;
+    }
+
+    const matches = [...(expose.match ?? []), ...(expose.advancedHTTP?.match ?? [])];
+    for (const match of matches) {
+      const uriPrefix = match.uri?.prefix;
+      const uriExact = match.uri?.exact;
+      if (uriPrefix && uriPrefix.startsWith("/")) {
+        prefixes.add(getPathMatchPrefix(uriPrefix));
+      }
+      if (uriExact && uriExact.startsWith("/")) {
+        prefixes.add(getPathMatchPrefix(uriExact));
+      }
+    }
+  }
+
+  prefixes.delete("/");
+  return Array.from(prefixes);
+}
+
+function buildExtraPathChains(event: AuthServiceEvent, baseChain: Chain): Chain[] {
+  if (!UDSConfig.pathRouting) {
+    return [];
+  }
+
+  const basePrefix = baseChain.match.prefix;
+  const prefixes = new Set(event.pathPrefixes ?? []);
+  prefixes.delete(basePrefix);
+
+  return Array.from(prefixes)
+    .filter(prefix => prefix.startsWith("/"))
+    .sort()
+    .map(prefix => ({
+      name: getExtraChainName(event.name, prefix),
+      match: {
+        header: ":path",
+        prefix,
+      },
+      filters: baseChain.filters,
+    }));
+}
+
+function buildChains(event: AuthServiceEvent): Chain[] {
+  const primaryChain = buildChain(event);
+  return [primaryChain, ...buildExtraPathChains(event, primaryChain)];
 }
 
 export async function authservice(
@@ -103,7 +191,12 @@ export async function authservice(
     const fullWaypointName = getWaypointName(sso.clientId);
 
     await reconcileAuthservice(
-      { name: sso.clientId, action: Action.AddClient, client },
+      {
+        name: sso.clientId,
+        action: Action.AddClient,
+        client,
+        pathPrefixes: collectPathPrefixesForSso(pkg, sso),
+      },
       sso.enableAuthserviceSelector!,
       isAmbient,
       pkg,
@@ -252,8 +345,8 @@ export function buildConfig(config: AuthserviceConfig, event: AuthServiceEvent) 
 
   if (event.action === Action.AddClient) {
     // Add the new chain to the existing authservice config
-    chains = config.chains.filter(chain => chain.name !== event.name);
-    chains = chains.concat(buildChain(event));
+    chains = config.chains.filter(chain => !isClientOwnedChain(chain.name, event.name));
+    chains = chains.concat(buildChains(event));
     // Sort the chains by their name before returning. Note that the accuracy of
     // sorting here is not relevant, only the consistency.
     const sortByName = R.sortBy(R.prop("name"));
@@ -261,7 +354,7 @@ export function buildConfig(config: AuthserviceConfig, event: AuthServiceEvent) 
   } else if (event.action === Action.RemoveClient) {
     // Search in the existing chains for the chain to remove by name.
     // Filtering here should preserve the order, so there is no need to re-sort.
-    chains = config.chains.filter(chain => chain.name !== event.name);
+    chains = config.chains.filter(chain => !isClientOwnedChain(chain.name, event.name));
     // Handle global config updates
   } else if (event.action === Action.UpdateGlobalConfig) {
     if (!event.redisUri) {

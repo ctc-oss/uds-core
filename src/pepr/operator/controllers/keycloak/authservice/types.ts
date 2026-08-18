@@ -19,6 +19,7 @@ export interface AuthServiceEvent {
   name: string;
   action: Action;
   client?: Client;
+  pathPrefixes?: string[];
   redisUri?: string;
   trustedCA?: string;
 }

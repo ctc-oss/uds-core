@@ -18,7 +18,7 @@ import { cleanupWaypointLabels } from "../../istio/ambient-waypoint";
 import { getWaypointName } from "../../istio/waypoint-utils";
 import { Client } from "../types";
 import * as authorizationPolicy from "./authorization-policy";
-import { authservice, buildChain, buildConfig } from "./authservice";
+import { authservice, buildChain, buildConfig, collectPathPrefixesForSso } from "./authservice";
 import * as configModule from "./config";
 import * as mockConfig from "./mock-authservice-config.json";
 import { Action, AuthserviceConfig, AuthServiceEvent } from "./types";
@@ -557,6 +557,85 @@ describe("authservice", () => {
 
     expect(chain.match.header).toEqual(":path");
     expect(chain.match.prefix).toEqual("/cge/kong");
+  });
+
+  test("should collect authservice path prefixes from matching expose rules", async () => {
+    const sso = {
+      name: "test-sso",
+      clientId: "test-client",
+      redirectUris: ["https://cge.net/cge/turbineone/"],
+      enableAuthserviceSelector: { "app.kubernetes.io/name": "external-app-auth-proxy" },
+    };
+
+    const pkg = {
+      apiVersion: "uds.dev/v1alpha1",
+      kind: "Package",
+      metadata: {
+        name: "test",
+        namespace: "turbineone",
+      },
+      spec: {
+        network: {
+          expose: [
+            {
+              selector: { "app.kubernetes.io/name": "external-app-auth-proxy" },
+              match: [
+                { uri: { exact: "/cge/turbineone" } },
+                { uri: { prefix: "/gql/" } },
+                { uri: { prefix: "/static/" } },
+              ],
+            },
+          ],
+        },
+        sso: [sso],
+      },
+    } as unknown as UDSPackage;
+
+    const prefixes = collectPathPrefixesForSso(pkg, sso);
+
+    expect(prefixes).toContain("/cge/turbineone");
+    expect(prefixes).toContain("/gql");
+    expect(prefixes).toContain("/static");
+  });
+
+  test("should add and remove additional path chains for the same client", async () => {
+    UDSConfig.pathRouting = true;
+    UDSConfig.contextPath = "/cge";
+    authorizationPolicy.UDSConfig.pathRouting = true;
+    authorizationPolicy.UDSConfig.contextPath = "/cge";
+
+    const addConfig = buildConfig(mockConfig as AuthserviceConfig, {
+      client: {
+        ...mockClient,
+        redirectUris: ["https://cge.net/cge/turbineone/"],
+      },
+      name: "cge-turbineone",
+      pathPrefixes: ["/cge/turbineone", "/gql", "/static", "/api/config"],
+      action: Action.AddClient,
+    });
+
+    expect(addConfig.chains.some(chain => chain.name === "cge-turbineone")).toBe(true);
+    expect(
+      addConfig.chains.some(
+        chain => chain.name.startsWith("cge-turbineone__extra__") && chain.match.prefix === "/gql",
+      ),
+    ).toBe(true);
+    expect(
+      addConfig.chains.some(
+        chain =>
+          chain.name.startsWith("cge-turbineone__extra__") && chain.match.prefix === "/api/config",
+      ),
+    ).toBe(true);
+
+    const removeConfig = buildConfig(addConfig, {
+      name: "cge-turbineone",
+      action: Action.RemoveClient,
+    });
+
+    expect(removeConfig.chains.some(chain => chain.name === "cge-turbineone")).toBe(false);
+    expect(
+      removeConfig.chains.some(chain => chain.name.startsWith("cge-turbineone__extra__")),
+    ).toBe(false);
   });
 
   test("should test authservice chain removal", async () => {
